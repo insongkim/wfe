@@ -519,20 +519,16 @@ wfe <- function (formula, data, treat = "treat.name",
             
 
         } else if ( (hetero.se == FALSE) & (auto.se == FALSE) ) {# indepdence and homoskedasticity
-            std.error <- "Homoskedastic Standard Error"
-            
-            ## Psi.hat.wfe <- nrow(X.tilde) * (sigma2 * ginv.XX.tilde)
-            Psi.hat.wfe <- J.u * (sigma2 * ginv.XX.tilde)            
-            
-            ## same as the following
 
-            ## Psi.hat.wfe2 <- J.u * sigma2 * solve(XX.tilde)
-            ## cat("compare homoskedasticity s.e\n")
-            ## print(sqrt(diag(Psi.hat.wfe)))
-            ## print(sqrt(diag(Psi.hat.wfe2)))
+            stop("standard errors with independence and homoskedasticity is not supported")
+
+            ## std.error <- "Homoskedastic Standard Error"
             
-            ## Psi.hat.fe <- nrow(X.hat) * vcov(fit.ols)
-            Psi.hat.fe <- J.u * vcov(fit.ols)            
+            ## ## Psi.hat.wfe <- nrow(X.tilde) * (sigma2 * ginv.XX.tilde)
+            ## Psi.hat.wfe <- J.u * (sigma2 * ginv.XX.tilde)            
+            
+            ## ## Psi.hat.fe <- nrow(X.hat) * vcov(fit.ols)
+            ## Psi.hat.fe <- J.u * vcov(fit.ols)            
 
         } else if ( (hetero.se == FALSE) & (auto.se == TRUE) ) {# Kiefer
 
@@ -1542,19 +1538,20 @@ wfe <- function (formula, data, treat = "treat.name",
                 
 
             } else if ( (hetero.se == FALSE) & (auto.se == FALSE) ) {# indepdence and homoskedasticity
-                std.error <- "Homoskedastic Standard Error"
-                
-                ## Psi.hat.wfe <- sigma2 * ( (length(y.tilde)*ginv.XX.tilde) %*% ((1/(length(y.tilde)-J.u-J.t-p+1))*(crossprod((X.tilde*data$W.it[nz.index]), X.tilde))) %*% (length(y.tilde)*ginv.XX.tilde) ) 
-                ## Psi.hat.fe <- (nrow(X.hat)) * vcov(fit.ols)
 
-                Psi.hat.wfe <- sigma2 * ( (J.u*ginv.XX.tilde) %*% ((1/J.u)*(crossprod((X.tilde*data$W.it[nz.index]), X.tilde))) %*% (J.u*ginv.XX.tilde) ) 
-                Psi.hat.fe <- (J.u) * vcov(fit.ols)
+                stop("standard errors with independence and homoskedasticity is not supported")
+
+                ## std.error <- "Homoskedastic Standard Error"
+                
+                ## ## Psi.hat.wfe <- sigma2 * ( (length(y.tilde)*ginv.XX.tilde) %*% ((1/(length(y.tilde)-J.u-J.t-p+1))*(crossprod((X.tilde*data$W.it[nz.index]), X.tilde))) %*% (length(y.tilde)*ginv.XX.tilde) ) 
+                ## ## Psi.hat.fe <- (nrow(X.hat)) * vcov(fit.ols)
+
+                ## Psi.hat.wfe <- sigma2 * ( (J.u*ginv.XX.tilde) %*% ((1/J.u)*(crossprod((X.tilde*data$W.it[nz.index]), X.tilde))) %*% (J.u*ginv.XX.tilde) ) 
+                ## Psi.hat.fe <- (J.u) * vcov(fit.ols)
                 
             } else if ( (hetero.se == FALSE) & (auto.se == TRUE) ) {# Kiefer
                 stop ("Robust standard errors with autocorrelation and homoskedasiticy is not supported")
             }
-
-
 
 
             ## vcov of wfe model
