@@ -3,9 +3,7 @@ export(wfe, pwfe)
 
 importFrom(Rcpp, evalCpp)
 ## exportPattern("^[[:alpha:]]+")
-export(FindMatches, wfe)
-
-
+## export(FindMatches, wfe)
 
 importFrom(arm, bayesglm)
 import(Matrix, MASS)

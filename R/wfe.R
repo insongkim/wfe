@@ -442,9 +442,12 @@ wfe <- function (formula, data, treat = "treat.name",
             ## Omega.hat.fe.HAC <- (1/(nrow(X.hat))) * Omega.hat.fe.HAC # without degree of freedom adjustment
             Omega.hat.fe.HAC <- df.adjust * Omega.hat.fe.HAC
 
-            Psi.hat.wfe <- (nrow(X.tilde) * ginv.XX.tilde) %*% Omega.hat.HAC %*% (nrow(X.tilde) * ginv.XX.tilde)
-            Psi.hat.fe <- (nrow(X.hat) * ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (nrow(X.hat) * ginv.XX.hat)
+            ## Psi.hat.wfe <- (nrow(X.tilde) * ginv.XX.tilde) %*% Omega.hat.HAC %*% (nrow(X.tilde) * ginv.XX.tilde)
+            ## Psi.hat.fe <- (nrow(X.hat) * ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (nrow(X.hat) * ginv.XX.hat)
 
+            Psi.hat.wfe <- (J.u*ginv.XX.tilde) %*% Omega.hat.HAC %*% (J.u*ginv.XX.tilde)
+            Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (J.u*ginv.XX.hat)
+            
         } else if ( (hetero.se == TRUE) & (auto.se == FALSE) ) {# independence across observations but heteroskedasticity
             std.error <- "Heteroscedastic Robust Standard Error"
 
@@ -457,9 +460,11 @@ wfe <- function (formula, data, treat = "treat.name",
             ## Omega.hat.HC <- (1/(nrow(X.tilde) - J.u - p)) * Omega.hat.HC
 
 
-            Omega.hat.HC <- (1/(nrow(X.tilde) - J.u - p))*(crossprod((X.tilde*diag.ee.tilde), X.tilde)) 
-            
-            Omega.hat.fe.HC <- (1/(nrow(X.hat) - J.u - p))*(crossprod((X.hat*diag.ee.hat), X.hat))  
+            ## Omega.hat.HC <- (1/(nrow(X.tilde) - J.u - p))*(crossprod((X.tilde*diag.ee.tilde), X.tilde)) 
+            ## Omega.hat.fe.HC <- (1/(nrow(X.hat) - J.u - p))*(crossprod((X.hat*diag.ee.hat), X.hat))  
+
+            Omega.hat.HC <- (1/J.u)*(crossprod((X.tilde*diag.ee.tilde), X.tilde)) 
+            Omega.hat.fe.HC <- (1/J.u)*(crossprod((X.hat*diag.ee.hat), X.hat))  
             
             
 ### Stock-Watson (Econometrica 2008: Eq(6)): Bias-asjusted for balance panel
@@ -493,24 +498,31 @@ wfe <- function (formula, data, treat = "treat.name",
 
                     cat("time", J.t, "\n")
                     Sigma_HRFE <- ((J.t-1)/(J.t-2))*(Omega.hat.HC - (1/(J.t-1))*B.hat)
-                    Psi.hat.wfe <- (nrow(X.tilde) * ginv.XX.tilde) %*% Sigma_HRFE %*% (nrow(X.tilde) * ginv.XX.tilde)
+                    ## Psi.hat.wfe <- (nrow(X.tilde) * ginv.XX.tilde) %*% Sigma_HRFE %*% (nrow(X.tilde) * ginv.XX.tilde)
+                    Psi.hat.wfe <- (J.u*ginv.XX.tilde) %*% Sigma_HRFE %*% (J.u*ginv.XX.tilde)
 
                     Sigma2_HRFE <- ((J.t-1)/(J.t-2))*(Omega.hat.fe.HC - (1/(J.t-1))*B2.hat)
-                    Psi.hat.fe <- (nrow(X.hat) * ginv.XX.hat) %*% Sigma2_HRFE %*% (nrow(X.hat) * ginv.XX.hat)
+                    ## Psi.hat.fe <- (nrow(X.hat) * ginv.XX.hat) %*% Sigma2_HRFE %*% (nrow(X.hat) * ginv.XX.hat)
+                    Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Sigma2_HRFE %*% (J.u*ginv.XX.hat)
+                    
+                    
                 } else { 
                     stop ("unbiased.se == TRUE is allowed only when panel is balanced")
                 }
             }
             
-            Psi.hat.wfe <- (nrow(X.tilde) * ginv.XX.tilde) %*% Omega.hat.HC %*% (nrow(X.tilde) * ginv.XX.tilde)
-            
-            Psi.hat.fe <- (nrow(X.hat) * ginv.XX.hat) %*% Omega.hat.fe.HC %*% (nrow(X.hat) * ginv.XX.hat)
+            ## Psi.hat.wfe <- (nrow(X.tilde) * ginv.XX.tilde) %*% Omega.hat.HC %*% (nrow(X.tilde) * ginv.XX.tilde)
+            ## Psi.hat.fe <- (nrow(X.hat) * ginv.XX.hat) %*% Omega.hat.fe.HC %*% (nrow(X.hat) * ginv.XX.hat)
 
+            Psi.hat.wfe <- (J.u*ginv.XX.tilde) %*% Omega.hat.HC %*% (J.u*ginv.XX.tilde)
+            Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Omega.hat.fe.HC %*% (J.u*ginv.XX.hat)
+            
 
         } else if ( (hetero.se == FALSE) & (auto.se == FALSE) ) {# indepdence and homoskedasticity
             std.error <- "Homoskedastic Standard Error"
             
-            Psi.hat.wfe <- nrow(X.tilde) * (sigma2 * ginv.XX.tilde)
+            ## Psi.hat.wfe <- nrow(X.tilde) * (sigma2 * ginv.XX.tilde)
+            Psi.hat.wfe <- J.u * (sigma2 * ginv.XX.tilde)            
             
             ## same as the following
 
@@ -519,7 +531,8 @@ wfe <- function (formula, data, treat = "treat.name",
             ## print(sqrt(diag(Psi.hat.wfe)))
             ## print(sqrt(diag(Psi.hat.wfe2)))
             
-            Psi.hat.fe <- nrow(X.hat) * vcov(fit.ols)
+            ## Psi.hat.fe <- nrow(X.hat) * vcov(fit.ols)
+            Psi.hat.fe <- J.u * vcov(fit.ols)            
 
         } else if ( (hetero.se == FALSE) & (auto.se == TRUE) ) {# Kiefer
 
@@ -527,8 +540,11 @@ wfe <- function (formula, data, treat = "treat.name",
 
         }
 
-        var.cov <- Psi.hat.wfe * (1/nrow(X.tilde))
-        var.cov.fe <- Psi.hat.fe *(1/nrow(X.hat))
+        ## var.cov <- Psi.hat.wfe * (1/nrow(X.tilde))
+        ## var.cov.fe <- Psi.hat.fe *(1/nrow(X.hat))
+
+        var.cov <- Psi.hat.wfe * (1/J.u)
+        var.cov.fe <- Psi.hat.fe *(1/J.u)
         
 ### traditional one way fixed effect results
 
@@ -1461,7 +1477,8 @@ wfe <- function (formula, data, treat = "treat.name",
                 Omega.hat.HAC <- matrix(Omega.hat.HAC, nrow=ncol(X.tilde), ncol=ncol(X.tilde), byrow=T)
                 ## Omega.hat.HAC <- (1/(nrow(X.tilde)-J.u-J.t-p+1))* Omega.hat.HAC
                 ## Omega.hat.HAC <- (1/(nrow(X.tilde)))* Omega.hat.HAC 
-                Omega.hat.HAC <- df.adjust * Omega.hat.HAC
+                ## Omega.hat.HAC <- df.adjust * Omega.hat.HAC
+                Omega.hat.HAC <- (1/J.u) * Omega.hat.HAC
 
 
                 ## check positive definiteness of Omega.hat.HAC
@@ -1474,13 +1491,16 @@ wfe <- function (formula, data, treat = "treat.name",
                 
                 Omega.hat.fe.HAC <- OmegaHatHAC(nrow(X.hat), ncol(X.hat), data$u.index, J.u, X.hat, u.hat)
                 Omega.hat.fe.HAC <- matrix(Omega.hat.fe.HAC, nrow = ncol(X.hat), ncol = ncol(X.hat))
-                Omega.hat.fe.HAC <- (1/(nrow(X.hat)-J.u-J.t-p)) * Omega.hat.fe.HAC
+                ## Omega.hat.fe.HAC <- (1/(nrow(X.hat)-J.u-J.t-p)) * Omega.hat.fe.HAC
+                Omega.hat.fe.HAC <- (1/J.u) * Omega.hat.fe.HAC
                 
                 
-                Psi.hat.wfe <- ((nrow(X.tilde))*ginv.XX.tilde) %*% Omega.hat.HAC %*% ((nrow(X.tilde))*ginv.XX.tilde)
-                
-                Psi.hat.fe <- (nrow(X.hat)*ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (nrow(X.hat)*ginv.XX.hat)
+                ## Psi.hat.wfe <- ((nrow(X.tilde))*ginv.XX.tilde) %*% Omega.hat.HAC %*% ((nrow(X.tilde))*ginv.XX.tilde)
+                ## Psi.hat.fe <- (nrow(X.hat)*ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (nrow(X.hat)*ginv.XX.hat)
 
+                Psi.hat.wfe <- (J.u*ginv.XX.tilde) %*% Omega.hat.HAC %*% (J.u*ginv.XX.tilde)
+                Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (J.u*ginv.XX.hat)
+                
                 ## garbage collection
                 rm(Omega.hat.HAC, Omega.hat.fe.HAC)
                 gc()
@@ -1493,9 +1513,12 @@ wfe <- function (formula, data, treat = "treat.name",
 
                 Omega.hat.HC <- as.double(comp_OmegaHC(c(X.tilde), e.tilde, c(X.tilde), e.tilde, dim(X.tilde)[1], dim(X.tilde)[2], data$u.index, J.u))
                 Omega.hat.HC <- matrix(Omega.hat.HC, nrow=ncol(X.tilde), ncol=ncol(X.tilde), byrow=T)
-                Omega.hat.HC <- (1/(nrow(X.tilde)-J.u-J.t-p+1))* Omega.hat.HC
+                ## Omega.hat.HC <- (1/(nrow(X.tilde)-J.u-J.t-p+1))* Omega.hat.HC
+                Omega.hat.HC <- (1/J.u)* Omega.hat.HC                
 
-                Psi.hat.wfe <- ((nrow(X.tilde))*ginv.XX.tilde) %*% Omega.hat.HC %*% ((nrow(X.tilde))*ginv.XX.tilde)
+                ## Psi.hat.wfe <- ((nrow(X.tilde))*ginv.XX.tilde) %*% Omega.hat.HC %*% ((nrow(X.tilde))*ginv.XX.tilde)
+                Psi.hat.wfe <- (J.u*ginv.XX.tilde) %*% Omega.hat.HC %*% (J.u*ginv.XX.tilde)
+                
                 ## ## alternatively calculation (don't need to invert)
                 ## Psi.hat.wfe2 <- (length(y.tilde)*ginv.XX.tilde) %*% ( (1/length(y.tilde)) * (crossprod((X.tilde*diag.ee.tilde), X.tilde)) ) %*% ((length(y.tilde))*ginv.XX.tilde)
 
@@ -1504,9 +1527,12 @@ wfe <- function (formula, data, treat = "treat.name",
 
                 Omega.hat.fe.he <- OmegaHatHC(nrow(X.hat), ncol(X.hat), data$u.index, J.u, X.hat, u.hat)
                 Omega.hat.fe.he <- matrix(Omega.hat.fe.he, nrow = ncol(X.hat), ncol = ncol(X.hat))
-                Omega.hat.fe.he <- (1/(nrow(X.hat)-J.u-J.t-p+1)) * Omega.hat.fe.he
+                ## Omega.hat.fe.he <- (1/(nrow(X.hat)-J.u-J.t-p+1)) * Omega.hat.fe.he
+                Omega.hat.fe.he <- (1/J.u) * Omega.hat.fe.he                
 
-                Psi.hat.fe <- (nrow(X.hat)*ginv.XX.hat) %*% Omega.hat.fe.he %*% (nrow(X.hat)*ginv.XX.hat)
+                ## Psi.hat.fe <- (nrow(X.hat)*ginv.XX.hat) %*% Omega.hat.fe.he %*% (nrow(X.hat)*ginv.XX.hat)
+                Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Omega.hat.fe.he %*% (J.u*ginv.XX.hat)                
+
                 ## Same as the following matrix multiplication
                 ## Psi.hat.fe <- (solve(XX.hat) %*% (1/d.f *(t(X.hat) %*% diag(diag(u.hat %*% t(u.hat))) %*% X.hat)) %*% solve(XX.hat))
 
@@ -1518,9 +1544,12 @@ wfe <- function (formula, data, treat = "treat.name",
             } else if ( (hetero.se == FALSE) & (auto.se == FALSE) ) {# indepdence and homoskedasticity
                 std.error <- "Homoskedastic Standard Error"
                 
-                Psi.hat.wfe <- sigma2 * ( (length(y.tilde)*ginv.XX.tilde) %*% ((1/(length(y.tilde)-J.u-J.t-p+1))*(crossprod((X.tilde*data$W.it[nz.index]), X.tilde))) %*% (length(y.tilde)*ginv.XX.tilde) ) 
-                Psi.hat.fe <- (nrow(X.hat)) * vcov(fit.ols)
+                ## Psi.hat.wfe <- sigma2 * ( (length(y.tilde)*ginv.XX.tilde) %*% ((1/(length(y.tilde)-J.u-J.t-p+1))*(crossprod((X.tilde*data$W.it[nz.index]), X.tilde))) %*% (length(y.tilde)*ginv.XX.tilde) ) 
+                ## Psi.hat.fe <- (nrow(X.hat)) * vcov(fit.ols)
 
+                Psi.hat.wfe <- sigma2 * ( (J.u*ginv.XX.tilde) %*% ((1/J.u)*(crossprod((X.tilde*data$W.it[nz.index]), X.tilde))) %*% (J.u*ginv.XX.tilde) ) 
+                Psi.hat.fe <- (J.u) * vcov(fit.ols)
+                
             } else if ( (hetero.se == FALSE) & (auto.se == TRUE) ) {# Kiefer
                 stop ("Robust standard errors with autocorrelation and homoskedasiticy is not supported")
             }
@@ -1529,7 +1558,8 @@ wfe <- function (formula, data, treat = "treat.name",
 
 
             ## vcov of wfe model
-            vcov.wfe <- Psi.hat.wfe * (1/nrow(X.tilde))
+            ## vcov.wfe <- Psi.hat.wfe * (1/nrow(X.tilde))
+            vcov.wfe <- Psi.hat.wfe * (1/J.u)            
             ## cat("dimension of vcov:", dim(vcov.wfe), "\n")
             se.did <- as.double(Re(sqrt(diag(vcov.wfe))))
             
@@ -1541,7 +1571,8 @@ wfe <- function (formula, data, treat = "treat.name",
             
             
             ## vcov of standard fe model (note:already divided by J.u)
-            var.cov.fe <- Psi.hat.fe * (1/nrow(X.hat))
+            ## var.cov.fe <- Psi.hat.fe * (1/nrow(X.hat))
+            var.cov.fe <- Psi.hat.fe * (1/J.u)            
             se.ols <- sqrt(diag(var.cov.fe))
 
 
