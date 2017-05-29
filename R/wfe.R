@@ -1371,8 +1371,7 @@ wfe <- function (formula, data, treat = "treat.name",
 
                     U.i <- t(X.dm) %*% W.diag %*% X.dm
                     U <- U + U.i
-                    V.i.tmp <- t(X.dm) %*% W.diag %*% (Y.dm-X.dm %*% Beta) %*% t(Y.dm-X.dm %*% Beta) %*% W.diag %*% X.dm
-                    V.i <- V.i.tmp %*% t(V.i.tmp)
+                    V.i <- t(X.dm) %*% W.diag %*% (Y.dm-X.dm %*% Beta) %*% t(Y.dm-X.dm %*% Beta) %*% W.diag %*% X.dm
                     V <- V + V.i
                 }
 
