@@ -1357,11 +1357,18 @@ wfe <- function (formula, data, treat = "treat.name",
                 V <- matrix(0, nrow=length(x.vars), ncol=length(x.vars))
                 Beta <- as.matrix(coef.wls)
                 
-                for(g in 1:length(n.units)){
+                for(g in 1:length(unique.units)){
+                    print(g)
                     unit.g <- unique.units[g]
                     Y.dm <- DemeanedMatrix[which(data$u.index==unit.g),1]
                     X.dm <- DemeanedMatrix[which(data$u.index==unit.g),-1]
-                    W.diag <- diag(data$W.it[data$u.index==unit.g])
+                    if(length(which(data$u.index==unit.g))==1){
+                        W.diag <- as.matrix(data$W.it[data$u.index==unit.g])
+                        Y.dm <- as.matrix(Y.dm)
+                        X.dm <- t(as.matrix(X.dm))
+                    } else {
+                        W.diag <- diag(data$W.it[data$u.index==unit.g])
+                    }
 
                     U.i <- t(X.dm) %*% W.diag %*% X.dm
                     U <- U + U.i
