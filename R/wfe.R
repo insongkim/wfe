@@ -1305,11 +1305,11 @@ wfe <- function (formula, data, treat = "treat.name",
                 ## stop ("Robust standard errors with autocorrelation is currently not supported")
 
                 ## Remove observations with zero weights
-                zero.ind <- which(data$W.it==0)
-                if(length(zero.ind)>0){
-                    data <- data[-zero.ind, ]
-                }
-                Nnonzero <- nrow(data)
+                ## zero.ind <- which(data$W.it==0)
+                ## if(length(zero.ind)>0){
+                ##     data <- data[-zero.ind, ]
+                ## }
+                n.units <- length(unique(data$u.index))
                 
                 ## Demean data
                 ## -----------------------------------------------------
@@ -1349,7 +1349,6 @@ wfe <- function (formula, data, treat = "treat.name",
                 ## lm(DemeanedMatrix[,1]~ -1 + DemeanedMatrix[,-1])
 
                 ## standard error calculation
-                n.units <- length(unique(data$u.index))
                 unique.units <- unique(data$u.index)
                 U <- matrix(0, nrow=length(x.vars), ncol=length(x.vars))
                 V <- matrix(0, nrow=length(x.vars), ncol=length(x.vars))
@@ -1369,8 +1368,8 @@ wfe <- function (formula, data, treat = "treat.name",
                 }
 
                 ## asymptotic variance using Methods of Moments
-                inv.U <- ginv(1/Nnonzero * U)
-                V <- 1/Nnonzero * V
+                inv.U <- ginv(1/n.units * U)
+                V <- 1/n.units * V
                 Psi.hat.wfe <- inv.U %*% V %*% inv.U
 
                 ## -----------------------------------------------------
@@ -1482,7 +1481,7 @@ wfe <- function (formula, data, treat = "treat.name",
 
             ## vcov of wfe model
             ## vcov.wfe <- Psi.hat.wfe * (1/nrow(X.tilde))
-            vcov.wfe <- Psi.hat.wfe * (1/Nnonzero)            
+            vcov.wfe <- Psi.hat.wfe * (1/n.units)            
             ## cat("dimension of vcov:", dim(vcov.wfe), "\n")
             se.did <- as.double(Re(sqrt(diag(vcov.wfe))))
             
