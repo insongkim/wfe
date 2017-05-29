@@ -1358,7 +1358,6 @@ wfe <- function (formula, data, treat = "treat.name",
                 Beta <- as.matrix(coef.wls)
                 
                 for(g in 1:length(unique.units)){
-                    print(g)
                     unit.g <- unique.units[g]
                     Y.dm <- DemeanedMatrix[which(data$u.index==unit.g),1]
                     X.dm <- DemeanedMatrix[which(data$u.index==unit.g),-1]
@@ -1378,7 +1377,7 @@ wfe <- function (formula, data, treat = "treat.name",
                 }
 
                 ## asymptotic variance using Methods of Moments
-                inv.U <- ginv(1/n.units * U)
+                inv.U <- solve(1/n.units * U)
                 V <- 1/n.units * V
                 Psi.hat.wfe <- inv.U %*% V %*% inv.U
 
