@@ -1305,10 +1305,10 @@ wfe <- function (formula, data, treat = "treat.name",
                 ## stop ("Robust standard errors with autocorrelation is currently not supported")
 
                 ## Remove observations with zero weights
-                ## zero.ind <- which(data$W.it==0)
-                ## if(length(zero.ind)>0){
-                ##     data <- data[-zero.ind, ]
-                ## }
+                zero.ind <- which(data$W.it==0)
+                if(length(zero.ind)>0){
+                    data <- data[-zero.ind, ]
+                }
                 n.units <- length(unique(data$u.index))
                 
                 ## Demean data
