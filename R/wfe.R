@@ -1326,8 +1326,8 @@ wfe <- function (formula, data, treat = "treat.name",
                 unit.counts <- as.numeric(table(data$time))
                 obs.counts <- nrow(data)
 
-                e <- environment()
-                save(file = "temp.RData", list = ls(), env = e)
+                ## e <- environment()
+                ## save(file = "temp.RData", list = ls(), env = e)
                 
                 for(k in 1:length(variables)){
                     v <- variables[k]
