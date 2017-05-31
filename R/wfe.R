@@ -1293,8 +1293,8 @@ wfe <- function (formula, data, treat = "treat.name",
             ## cat("sigma2", sigma2, "\n")
 
 
-            ## e <- environment()
-            ## save(file = "temp.RData", list = ls(), env = e)
+            e <- environment()
+            save(file = "temp.RData", list = ls(), env = e)
 
             ## two-way WFE robust standard errors calculation
 
@@ -1376,7 +1376,7 @@ wfe <- function (formula, data, treat = "treat.name",
                 }
 
                 ## asymptotic variance using Methods of Moments
-                inv.U <- solve(1/n.units * U)
+                inv.U <- ginv(1/n.units * U)
                 V <- 1/n.units * V
                 Psi.hat.wfe <- inv.U %*% V %*% inv.U
 
