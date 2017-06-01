@@ -1292,9 +1292,8 @@ wfe <- function (formula, data, treat = "treat.name",
             
             ## cat("sigma2", sigma2, "\n")
 
-
-            e <- environment()
-            save(file = "temp.RData", list = ls(), env = e)
+            ## e <- environment()
+            ## save(file = "temp.RData", list = ls(), env = e)
 
             ## two-way WFE robust standard errors calculation
 
