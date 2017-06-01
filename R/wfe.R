@@ -1384,7 +1384,6 @@ wfe <- function (formula, data, treat = "treat.name",
                 ## vcov matrix for FE for White statistics calculation
                 ## -----------------------------------------------------
 
-
                 Omega.hat.fe.HAC <- OmegaHatHAC(nrow(X.hat), ncol(X.hat), data$u.index, J.u, X.hat, u.hat)
                 Omega.hat.fe.HAC <- matrix(Omega.hat.fe.HAC, nrow = ncol(X.hat), ncol = ncol(X.hat))
                 ## Omega.hat.fe.HAC <- (1/(nrow(X.hat)-J.u-J.t-p)) * Omega.hat.fe.HAC
