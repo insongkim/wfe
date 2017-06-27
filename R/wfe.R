@@ -18,7 +18,6 @@ wfe <- function (formula, data, treat = "treat.name",
     class(data) <- "data.frame"
 
     ## ## remove missing variables: removing rows with missing values in either y or treat
-
     remove.indices <- which(!rownames(data) %in% rownames(mf))
     
     
