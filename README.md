@@ -2,7 +2,7 @@
 
 This R package provides a computationally efficient way of fitting
 weighted linear fixed effects estimators for causal inference with
-various weighting schemes. Imai and Kim (2012) show that weighted
+various weighting schemes. Imai and Kim (2016) show that weighted
 linear fixed effects estimators can be used to estimate the average
 treatment effects under different identification strategies. This
 includes stratified randomized experiments, matching and
