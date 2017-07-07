@@ -78,7 +78,7 @@ wfe(formula, data, treat = "treat.name",
     default is \code{TRUE}.
   }
 
-  \item{df.adjust}{a logical value indicating whether a degrees of freedom adjustment 
+  \item{df.adjustment}{a logical value indicating whether a degrees of freedom adjustment 
       for standard errors calculation is performed. The default is \code{TRUE}.
   }
 

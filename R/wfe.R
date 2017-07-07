@@ -1482,7 +1482,7 @@ wfe <- function (formula, data, treat = "treat.name",
             ## vcov of wfe model
 
             ## degrees of freedom correction
-            if(df.adjust == TRUE){
+            if(df.adjustment == TRUE){
                 Nstar <- nrow(data)-length(which(data$W.it==0))
                 nK <- dim(X.tilde)[2]
                 df.correction <- (Nstar-nK+1)/(Nstar-n.units-n.times-nK+1)
