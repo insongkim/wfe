@@ -13,7 +13,7 @@
 wfe(formula, data, treat = "treat.name",
     unit.index, time.index = NULL, method = "unit",
     qoi = "ate", estimator = NULL, C.it = NULL,
-    hetero.se = TRUE, auto.se = TRUE, df.adjust = TRUE,
+    hetero.se = TRUE, auto.se = TRUE, df.adjustment = TRUE,
     White = TRUE, White.alpha = 0.05,
     verbose = TRUE, unbiased.se = FALSE, unweighted = FALSE,
     store.wdm = FALSE, maxdev.did = NULL,
