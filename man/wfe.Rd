@@ -13,7 +13,7 @@
 wfe(formula, data, treat = "treat.name",
     unit.index, time.index = NULL, method = "unit",
     qoi = "ate", estimator = NULL, C.it = NULL,
-    hetero.se = TRUE, auto.se = TRUE,
+    hetero.se = TRUE, auto.se = TRUE, df.adjust = TRUE,
     White = TRUE, White.alpha = 0.05,
     verbose = TRUE, unbiased.se = FALSE, unweighted = FALSE,
     store.wdm = FALSE, maxdev.did = NULL,
@@ -77,7 +77,11 @@ wfe(formula, data, treat = "treat.name",
     autocorrelation is allowed in calculating standard errors. The
     default is \code{TRUE}.
   }
- 
+
+  \item{df.adjust}{a logical value indicating whether a degrees of freedom adjustment 
+      for standard errors calculation is performed. The default is \code{TRUE}.
+  }
+
   \item{White}{a logical value indicating whether White misspecification
     statistics should be calculated. The default is \code{TRUE}.
   }
