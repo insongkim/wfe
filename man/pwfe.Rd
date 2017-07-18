@@ -187,6 +187,8 @@ pwfe(formula, treat = "treat.name", outcome, data, pscore = NULL,
 ### generated panel data with arbitrary number of units and time.
 
 ## generate panel data with number of units = N, number of time = Time
+\dontrun{
+
 N <- 10 # number of distinct units
 Time <- 15 # number of distinct time
 
@@ -298,6 +300,8 @@ mod.ps <- pwfe(treat = "tr", outcome = "y", data = Data.obs, pscore = "pscore",
 
 ## summarize the results
 summary(mod.ps)
+}
+
 }
 
 \author{Kosuke Imai, Princeton University, \email{kimai@princeton.edu}

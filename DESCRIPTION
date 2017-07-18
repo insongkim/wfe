@@ -1,26 +1,31 @@
 Package: wfe
+Type: Package
+Title: Weighted Linear Fixed Effects Regression Models for Causal Inference
 Version: 1.6
 Date: 2017-07-18
-Title: Weighted Linear Fixed Effects Regression Models for Causal Inference
-Author: In Song Kim <insong@mit.edu>, Kosuke Imai <kimai@Princeton.edu>
-Maintainer: In Song Kim <insong@mit.edu>
-Depends: R (>= 2.11.0), utils, arm (>= 1.4-6), Matrix, MASS, methods
-Description: This R package provides a computationally efficient way
+Authors@R: c(
+  person("In Song", "Kim", email = "insong@mit.edu", role = c("aut", "cre")),
+  person("Kosuke", "Imai", email = "kimai@Princeton.edu", role = c("aut")),
+  person("Erik", "Wang", email = "haixiaow@princeton.edu", role = c("aut"))
+  )
+Description: Provides a computationally efficient way
 	     of fitting weighted linear fixed effects estimators for
-	     causal inference with various weighting schemes.  Imai
-	     and Kim (2016) show that weighted linear fixed effects
-	     estimators can be used to estimate the average treatment
+	     causal inference with various weighting schemes. The package implements methods described in Imai and Kim (2017) ''When Should We Use Linear Fixed Effects Regression Models for Causal Inference with Longitudinal Data?'', available at <https://imai.princeton.edu/research/FEmatch.html>. Weighted linear fixed effects estimators can be used to estimate the average treatment
 	     effects under different identification strategies.  This
 	     includes stratified randomized experiments, matching and
 	     stratification for observational studies, first
-	     differencing, and difference-in-differences.  The package
-	     also provides various robust standard errors and a
+	     differencing, and difference-in-differences. Also provides various robust standard errors and a
 	     specification test for standard linear fixed effects
 	     estimators.
-LazyLoad: yes
-LazyData: yes
-License: GPL (>=2)
-Imports: Rcpp (>= 0.12.5)
-LinkingTo: Rcpp, RcppArmadillo
+License: GPL(>= 2)
+Imports:
+    utils,
+    arm,
+    Matrix,
+    MASS,
+    methods
+Depends: R (>= 2.11.0)
+Encoding: UTF-8
+LazyData: true
 BugReports: https://github.com/insongkim/wfe/issues
 

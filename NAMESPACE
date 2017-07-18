@@ -1,7 +1,7 @@
 useDynLib(wfe, .registration = TRUE, .fixes = "C_")
 export(wfe, pwfe)
 
-importFrom(Rcpp, evalCpp)
+## importFrom(Rcpp, evalCpp)
 ## exportPattern("^[[:alpha:]]+")
 
 importFrom(arm, bayesglm)

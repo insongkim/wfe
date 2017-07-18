@@ -294,7 +294,7 @@ summary(mod.obs)
 summary(mod.obs)$W
 
 
-
+\dontrun{
 ###################################################################
 # Example 3: Observational Studies with differences-in-differences
 ###################################################################
@@ -343,7 +343,7 @@ mod.did2 <- wfe(y~ tr+x1+x2, data = Data.obs, treat = "tr",
 ## summarize the results
 summary(mod.did2)
 mod.did2$coef[1] ==  mod.did$coef[1]
-
+}
 
 }
 
