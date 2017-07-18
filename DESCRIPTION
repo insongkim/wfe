@@ -13,7 +13,7 @@ Description: Provides a computationally efficient way of fitting
 	     inference with various weighting schemes. Weighted linear
 	     fixed effects estimators can be used to estimate the
 	     average treatment effects under different identification
-	     strategies.  This includes stratified randomized
+	     strategies. This includes stratified randomized
 	     experiments, matching and stratification for
 	     observational studies, first differencing, and
 	     difference-in-differences. The package implements methods
