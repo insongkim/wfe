@@ -87,7 +87,7 @@ wfe(formula, data, treat = "treat.name",
   }
   
   \item{White.alpha}{level of functional specification test. See White
-    (1980) and Imai and Kim (2016). The default is \code{0.05}.
+    (1980) and Imai and Kim (2017). The default is \code{0.05}.
   }
 
   \item{verbose}{logical. If \code{TRUE}, helpful messages along with
@@ -184,7 +184,7 @@ wfe(formula, data, treat = "treat.name",
 
 }
 
-\references{Imai, Kosuke and In Song Kim. (2016) ``When Should We Use
+\references{Imai, Kosuke and In Song Kim. (2017) ``When Should We Use
   Linear Fixed Effects Regression Models for Causal Inference with
   Longitudinal Data?'' Technical Report, Department of Politics,
   Princeton University.  available at

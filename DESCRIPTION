@@ -8,15 +8,19 @@ Authors@R: c(
   person("Kosuke", "Imai", email = "kimai@Princeton.edu", role = c("aut")),
   person("Erik", "Wang", email = "haixiaow@princeton.edu", role = c("aut"))
   )
-Description: Provides a computationally efficient way
-	     of fitting weighted linear fixed effects estimators for
-	     causal inference with various weighting schemes. The package implements methods described in Imai and Kim (2017) ''When Should We Use Linear Fixed Effects Regression Models for Causal Inference with Longitudinal Data?'', available at <https://imai.princeton.edu/research/FEmatch.html>. Weighted linear fixed effects estimators can be used to estimate the average treatment
-	     effects under different identification strategies.  This
-	     includes stratified randomized experiments, matching and
-	     stratification for observational studies, first
-	     differencing, and difference-in-differences. Also provides various robust standard errors and a
-	     specification test for standard linear fixed effects
-	     estimators.
+Description: Provides a computationally efficient way of fitting
+	     weighted linear fixed effects estimators for causal
+	     inference with various weighting schemes. Weighted linear
+	     fixed effects estimators can be used to estimate the
+	     average treatment effects under different identification
+	     strategies.  This includes stratified randomized
+	     experiments, matching and stratification for
+	     observational studies, first differencing, and
+	     difference-in-differences. The package implements methods
+	     described in Imai and Kim (2017) ''When Should We Use
+	     Linear Fixed Effects Regression Models for Causal
+	     Inference with Longitudinal Data?'', available at
+	     <https://imai.princeton.edu/research/FEmatch.html>.
 License: GPL(>= 2)
 Imports:
     utils,
