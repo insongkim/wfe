@@ -1,6 +1,6 @@
 Package: wfe
 Version: 1.6
-Date: 2016-07-03
+Date: 2017-07-18
 Title: Weighted Linear Fixed Effects Regression Models for Causal Inference
 Author: In Song Kim <insong@mit.edu>, Kosuke Imai <kimai@Princeton.edu>
 Maintainer: In Song Kim <insong@mit.edu>
@@ -22,4 +22,5 @@ LazyData: yes
 License: GPL (>=2)
 Imports: Rcpp (>= 0.12.5)
 LinkingTo: Rcpp, RcppArmadillo
+BugReports: https://github.com/insongkim/wfe/issues
 

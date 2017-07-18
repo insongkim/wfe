@@ -1,9 +1,8 @@
-useDynLib(wfe)
+useDynLib(wfe, .registration = TRUE, .fixes = "C_")
 export(wfe, pwfe)
 
 importFrom(Rcpp, evalCpp)
 ## exportPattern("^[[:alpha:]]+")
-## export(FindMatches, wfe)
 
 importFrom(arm, bayesglm)
 import(Matrix, MASS)
