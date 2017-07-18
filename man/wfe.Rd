@@ -194,7 +194,7 @@ wfe(formula, data, treat = "treat.name",
   Standard Errors for Fixed Effect Panel Data Regression'' Econometrica,
   76, 1.
   
-  White, Halbert. (1980) `Using Least Squares to Approximate Unknown
+  White, Halbert. (1980) ``Using Least Squares to Approximate Unknown
   Regression Functions.''  International Economic Review, 21, 1,
   149--170.
 
