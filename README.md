@@ -1,4 +1,4 @@
-# wfe: Weighted Linear Fixed Effects Regression Models for Causal Inference [![Build Status](https://travis-ci.org/insongkim/wfe.svg?branch=master)](https://travis-ci.org/insongkim/wfe)
+# wfe: Weighted Linear Fixed Effects Regression Models for Causal Inference [![Build Status](https://travis-ci.org/insongkim/wfe.svg?branch=master)](https://travis-ci.org/insongkim/wfe) [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/wfe)](https://cran.r-project.org/package=wfe)
 
 This R package provides a computationally efficient way of fitting
 weighted linear fixed effects estimators for causal inference with
