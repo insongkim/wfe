@@ -515,6 +515,14 @@ wfe <- function (formula, data, treat = "treat.name",
 
             Psi.hat.wfe <- (J.u*ginv.XX.tilde) %*% Omega.hat.HC %*% (J.u*ginv.XX.tilde)
             Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Omega.hat.fe.HC %*% (J.u*ginv.XX.hat)
+
+            ## degrees of freedom adjustment: G / (G -1) * N / (N - K + 1)
+            ## where G is the number of groups (number of fixed effects),
+            ## N is the number of non-zero weights
+            K <- nc-3
+            dfHC <- J.u/(J.u-1) * nz.obs/(nz.obs-K+1)
+            Psi.hat.wfe <- dfHC * Psi.hat.wfe
+            Psi.hat.fe <- dfHC * Psi.hat.fe
             
 
         } else if ( (hetero.se == FALSE) & (auto.se == FALSE) ) {# indepdence and homoskedasticity
