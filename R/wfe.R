@@ -519,8 +519,9 @@ wfe <- function (formula, data, treat = "treat.name",
             ## degrees of freedom adjustment: G / (G -1) * N / (N - K + 1)
             ## where G is the number of groups (number of fixed effects),
             ## N is the number of non-zero weights
+	    Nnonzero <- length(which(data$W.it !=0))
             K <- nc-3
-            dfHC <- J.u/(J.u-1) * nz.obs/(nz.obs-K+1)
+            dfHC <- (J.u/(J.u-1)) * (Nnonzero/(Nnonzero-K+1))
             Psi.hat.wfe <- dfHC * Psi.hat.wfe
             Psi.hat.fe <- dfHC * Psi.hat.fe
             
