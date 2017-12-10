@@ -2,7 +2,7 @@ wfe <- function (formula, data, treat = "treat.name",
                  unit.index, time.index = NULL, method = "unit",
                  qoi = "ate", estimator = NULL, C.it = NULL,
                  hetero.se = TRUE, auto.se = TRUE, df.adjustment = TRUE,
-                 dyad.se = NULL,
+                 dyad.se = FALSE,
                  White = TRUE, White.alpha = 0.05,
                  verbose = TRUE, unbiased.se = FALSE, unweighted = FALSE,
                  store.wdm = FALSE, maxdev.did= NULL,
@@ -490,17 +490,11 @@ wfe <- function (formula, data, treat = "treat.name",
                 return(Omega.hat.dyad)                
             }
 
-            ## degrees of freedom adjustment
-            df.adjust <- 1/(nrow(X.tilde)) * ((nrow(X.tilde)-1)/(nrow(X.tilde)-J.u-p)) * (J.u/(J.u-1))
-            
             Omega.hat.DYAD <- OmegaDyad(X.tilde, u.tilde, data$dyad, data$imf1, data$imf2)
-            Omega.hat.DYAD <- df.adjust * Omega.hat.DYAD
-
             Omega.hat.fe.DYAD <- OmegaDyad(X.hat, u.hat, data$dyad, data$imf1, data$imf2)
-            Omega.hat.fe.DYAD <- df.adjust * Omega.hat.fe.DYAD
-            
-            Psi.hat.wfe <- (J.u*ginv.XX.tilde) %*% Omega.hat.DYAD %*% (J.u*ginv.XX.tilde)
-            Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Omega.hat.fe.DYAD %*% (J.u*ginv.XX.hat)
+
+            Psi.hat.wfe <- (ginv.XX.tilde) %*% Omega.hat.DYAD %*% (ginv.XX.tilde)
+            Psi.hat.fe <- (ginv.XX.hat) %*% Omega.hat.fe.DYAD %*% (ginv.XX.hat)
 
         } else if ((hetero.se == TRUE) & (auto.se == TRUE)) {# Default is Arellano
             std.error <- "Heteroscedastic / Autocorrelation Robust Standard Error"
