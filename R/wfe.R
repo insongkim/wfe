@@ -622,7 +622,14 @@ wfe <- function (formula, data, treat = "treat.name",
 
         var.cov <- Psi.hat.wfe * (1/J.u)
         var.cov.fe <- Psi.hat.fe *(1/J.u)
-        
+
+        if(dyad.se == TRUE){
+            ncty <- length(unique(c(data$imf1, data$imf2)))
+            var.cov <- Psi.hat.wfe * (1/ncty)
+            var.cov.fe <- Psi.hat.fe *(1/ncty)
+        }       
+
+
 ### traditional one way fixed effect results
 
         
