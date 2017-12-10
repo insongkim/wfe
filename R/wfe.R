@@ -428,6 +428,8 @@ wfe <- function (formula, data, treat = "treat.name",
 
 
         if(dyad.se == TRUE){
+
+            std.error <- "Robust Standard Error for Dyadic Data"
             
             OmegaDyad <- function(X.tilde, e.tilde, dyadID, c1, c2) {
 
@@ -487,6 +489,9 @@ wfe <- function (formula, data, treat = "treat.name",
                 }
                 return(Omega.hat.dyad)                
             }
+
+            ## degrees of freedom adjustment
+            df.adjust <- 1/(nrow(X.tilde)) * ((nrow(X.tilde)-1)/(nrow(X.tilde)-J.u-p)) * (J.u/(J.u-1))
             
             Omega.hat.DYAD <- OmegaDyad(X.tilde, u.tilde, data$dyad, data$imf1, data$imf2)
             Omega.hat.DYAD <- df.adjust * Omega.hat.DYAD
