@@ -434,7 +434,7 @@ wfe <- function (formula, data, treat = "treat.name",
                 uniq.dyadID <- unique(dyadID)
                 
                 for(d in 1:length(uniq.dyadID)){
-                    print(d)
+                    ## print(d)
                     dyad.d <- uniq.dyadID[d]
                     cty1 <- substring(dyad.d, 1,3)
                     cty2 <- substring(dyad.d, 4,6)
