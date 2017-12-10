@@ -428,8 +428,8 @@ wfe <- function (formula, data, treat = "treat.name",
 
 
         if(dyad.se == TRUE){
-
-            OmegaDyad <- function(X.tilde, e.tilde, dyadID, c1, c2){
+            
+            OmegaDyad <- function(X.tilde, e.tilde, dyadID, c1, c2) {
 
                 uniq.dyadID <- unique(dyadID)
                 
@@ -484,17 +484,14 @@ wfe <- function (formula, data, treat = "treat.name",
                     } else {
                         Omega.hat.dyad <- Omega.hat.dyad + Omega.hat + Oprime
                     }
-                    
                 }
-                
-                return(Omega.hat.dyad)
-                
+                return(Omega.hat.dyad)                
             }
-
-            Omega.hat.DYAD <- OmegaDyad(X.tilde, u.tilde, data$dyad, data$imf1, data$imf2){
+            
+            Omega.hat.DYAD <- OmegaDyad(X.tilde, u.tilde, data$dyad, data$imf1, data$imf2)
             Omega.hat.DYAD <- df.adjust * Omega.hat.DYAD
 
-            Omega.hat.fe.DYAD <- OmegaDyad(X.hat, u.hat, data$dyad, data$imf1, data$imf2){
+            Omega.hat.fe.DYAD <- OmegaDyad(X.hat, u.hat, data$dyad, data$imf1, data$imf2)
             Omega.hat.fe.DYAD <- df.adjust * Omega.hat.fe.DYAD
             
             Psi.hat.wfe <- (J.u*ginv.XX.tilde) %*% Omega.hat.DYAD %*% (J.u*ginv.XX.tilde)
