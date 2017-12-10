@@ -14,6 +14,7 @@ wfe(formula, data, treat = "treat.name",
     unit.index, time.index = NULL, method = "unit",
     qoi = "ate", estimator = NULL, C.it = NULL,
     hetero.se = TRUE, auto.se = TRUE, df.adjustment = TRUE,
+    dyad.se = NULL,
     White = TRUE, White.alpha = 0.05,
     verbose = TRUE, unbiased.se = FALSE, unweighted = FALSE,
     store.wdm = FALSE, maxdev.did = NULL,
@@ -76,6 +77,10 @@ wfe(formula, data, treat = "treat.name",
   \item{auto.se}{a logical value indicating whether arbitrary
     autocorrelation is allowed in calculating standard errors. The
     default is \code{TRUE}.
+  }
+
+  \item{dyad.se}{a logical value indicating whether correlations across dyads exist. The
+    default is \code{NULL}.
   }
 
   \item{df.adjustment}{a logical value indicating whether a degrees of freedom adjustment 
@@ -190,6 +195,9 @@ wfe(formula, data, treat = "treat.name",
   Princeton University.  available at
   \url{http://imai.princeton.edu/research/FEmatch.html}
 
+  Aronow, Peter M., Cyrus Samii, and Valentina A. Assenova (2015) ``Cluster–robust
+  Variance Estimation for Dyadic Data." Political Analysis 23, no. 4, 564--577.
+	
   Stock, James and Mark Watson. (2008) ``Heteroskedasticity-Robust
   Standard Errors for Fixed Effect Panel Data Regression'' Econometrica,
   76, 1.

@@ -2,6 +2,7 @@ wfe <- function (formula, data, treat = "treat.name",
                  unit.index, time.index = NULL, method = "unit",
                  qoi = "ate", estimator = NULL, C.it = NULL,
                  hetero.se = TRUE, auto.se = TRUE, df.adjustment = TRUE,
+                 dyad.se = NULL,
                  White = TRUE, White.alpha = 0.05,
                  verbose = TRUE, unbiased.se = FALSE, unweighted = FALSE,
                  store.wdm = FALSE, maxdev.did= NULL,
@@ -422,10 +423,86 @@ wfe <- function (formula, data, treat = "treat.name",
         diag.ee.tilde <- c(u.tilde^2)
         diag.ee.hat <- c(u.hat^2)
 
-        
-        if ((hetero.se == TRUE) & (auto.se == TRUE)) {# Default is Arellano
-            std.error <- "Heteroscedastic / Autocorrelation Robust Standard Error"
+        e <- environment()
+        save(file = "dyadSE.RData", list = ls(), env = e)
 
+
+        if(dyad.se == TRUE){
+
+            OmegaDyad <- function(X.tilde, e.tilde, dyadID, c1, c2){
+
+                uniq.dyadID <- unique(dyadID)
+                
+                for(d in 1:length(uniq.dyadID)){
+                    print(d)
+                    dyad.d <- uniq.dyadID[d]
+                    cty1 <- substring(dyad.d, 1,3)
+                    cty2 <- substring(dyad.d, 4,6)
+                    
+                    idx.d <- which(dyadID == dyad.d)
+                    x.d <- X.tilde[idx.d,]
+                    e.d <- matrix(e.tilde[idx.d], ncol=1)
+                    
+                    ## consider all the other dyads in which country 1 or country
+                    ## 2 is the member
+                    idx.dprime <- which( (c1==cty1 | c2 == cty2) & dyadID!=dyad.d)
+                    uniq.dprime <- unique(dyadID[idx.dprime])
+
+                    ## in case only one year is observed
+                    if(is.null(nrow(x.d))){
+                        x.d <- t(matrix(x.d, ncol=1))
+                        Omega.hat <- as.numeric(e.d^2)*t(x.d)%*%(x.d)
+                    } else {
+                        Omega.hat <- t(x.d) %*% e.d %*% t(e.d) %*% x.d
+                    }
+
+                    ## loop over all dyads that have one of the two members
+                    for(p in 1:length(uniq.dprime)){
+                        ## print(p)
+                        dprime <- uniq.dprime[p]
+                        idx.dprime <- which(dyadID == dprime)
+                        x.dprime <- X.tilde[idx.dprime,]
+                        e.dprime <- matrix(e.tilde[idx.dprime], ncol=1)
+
+                        if(is.null(nrow((x.dprime)))){
+                            x.dprime <- t(matrix(x.dprime, ncol=1))
+                            Odprime <- as.numeric(e.dprime^2)*t(x.dprime)%*%(x.dprime)
+                        } else {
+                            Odprime <- t(x.dprime) %*% e.dprime %*% t(e.dprime) %*% x.dprime
+                        }
+                        
+                        if(p==1){
+                            Oprime <- Odprime
+                        } else {
+                            Oprime <- Oprime + Odprime 
+                        }
+                    }
+
+                    ## storing results
+                    if(d==1){
+                        Omega.hat.dyad <- Omega.hat + Oprime
+                    } else {
+                        Omega.hat.dyad <- Omega.hat.dyad + Omega.hat + Oprime
+                    }
+                    
+                }
+                
+                return(Omega.hat.dyad)
+                
+            }
+
+            Omega.hat.DYAD <- OmegaDyad(X.tilde, u.tilde, data$dyad, data$imf1, data$imf2){
+            Omega.hat.DYAD <- df.adjust * Omega.hat.DYAD
+
+            Omega.hat.fe.DYAD <- OmegaDyad(X.hat, u.hat, data$dyad, data$imf1, data$imf2){
+            Omega.hat.fe.DYAD <- df.adjust * Omega.hat.fe.DYAD
+            
+            Psi.hat.wfe <- (J.u*ginv.XX.tilde) %*% Omega.hat.DYAD %*% (J.u*ginv.XX.tilde)
+            Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Omega.hat.fe.DYAD %*% (J.u*ginv.XX.hat)
+
+        } else if ((hetero.se == TRUE) & (auto.se == TRUE)) {# Default is Arellano
+            std.error <- "Heteroscedastic / Autocorrelation Robust Standard Error"
+            
             ## 1. arbitrary autocorrelation as well as heteroskedasticity (Eq 12)
 
             ## degrees of freedom adjustment
