@@ -1,5 +1,6 @@
 wfe <- function (formula, data, treat = "treat.name",
                  unit.index, time.index = NULL, method = "unit",
+                 dyad1.index = NULL, dyad2.index = NULL,
                  qoi = "ate", estimator = NULL, C.it = NULL,
                  hetero.se = TRUE, auto.se = TRUE, df.adjustment = TRUE,
                  dyad.se = FALSE,
@@ -110,6 +111,19 @@ wfe <- function (formula, data, treat = "treat.name",
     uniq.u <- sort(uniq.u[!(uniq.u %in% 0)])
     J.u <- length(uniq.u)
     data$u.index <- Index(numeric.u.index, uniq.u, J.u, tn.row)
+
+    ## for dyadic data: unit 1 and unit 2 that compose each dyad
+    if(dyad.se == TRUE){
+        ## Warning 
+        if(is.null(dyad1.index) | is.null(dyad2.index)){
+            stop("Warning: For dyadic data, two separate unit indices for the members of each dyad -- dyad1.index, dyad2.indx -- should be provided")
+        }
+
+        data$dyad <- data[, unit.index]
+        data$c1 <- data[, dyad1.index]
+        data$c2 <- data[, dyad2.index]
+
+    }
 
     ## time index
     if (is.null(time.index)) {
@@ -423,8 +437,8 @@ wfe <- function (formula, data, treat = "treat.name",
         diag.ee.tilde <- c(u.tilde^2)
         diag.ee.hat <- c(u.hat^2)
 
-        e <- environment()
-        save(file = "dyadSE.RData", list = ls(), env = e)
+        ## e <- environment()
+        ## save(file = "dyadSE.RData", list = ls(), env = e)
 
 
         if(dyad.se == TRUE){
@@ -438,8 +452,8 @@ wfe <- function (formula, data, treat = "treat.name",
                 for(d in 1:length(uniq.dyadID)){
                     ## print(d)
                     dyad.d <- uniq.dyadID[d]
-                    cty1 <- substring(dyad.d, 1,3)
-                    cty2 <- substring(dyad.d, 4,6)
+                    cty1 <- c1[which(dyadID == dyad.d)][1]
+                    cty2 <- c2[which(dyadID == dyad.d)][1]
                     
                     idx.d <- which(dyadID == dyad.d)
                     x.d <- X.tilde[idx.d,]
@@ -468,9 +482,10 @@ wfe <- function (formula, data, treat = "treat.name",
 
                         if(is.null(nrow((x.dprime)))){
                             x.dprime <- t(matrix(x.dprime, ncol=1))
-                            Odprime <- as.numeric(e.dprime^2)*t(x.dprime)%*%(x.dprime)
+                            e.dprime <- as.matrix(as.numeric(e.dprime))
+                            Odprime <- t(x.d) %*% e.d %*% t(e.dprime) %*% x.dprime
                         } else {
-                            Odprime <- t(x.dprime) %*% e.dprime %*% t(e.dprime) %*% x.dprime
+                            Odprime <- t(x.d) %*% e.d %*% t(e.dprime) %*% x.dprime
                         }
                         
                         if(p==1){
@@ -490,8 +505,8 @@ wfe <- function (formula, data, treat = "treat.name",
                 return(Omega.hat.dyad)                
             }
 
-            Omega.hat.DYAD <- OmegaDyad(X.tilde, u.tilde, data$dyad, data$imf1, data$imf2)
-            Omega.hat.fe.DYAD <- OmegaDyad(X.hat, u.hat, data$dyad, data$imf1, data$imf2)
+            Omega.hat.DYAD <- OmegaDyad(X.tilde, u.tilde, data$dyad, data$c1, data$c2)
+            Omega.hat.fe.DYAD <- OmegaDyad(X.hat, u.hat, data$dyad, data$c1, data$c2)
 
             Psi.hat.wfe <- (ginv.XX.tilde) %*% Omega.hat.DYAD %*% (ginv.XX.tilde)
             Psi.hat.fe <- (ginv.XX.hat) %*% Omega.hat.fe.DYAD %*% (ginv.XX.hat)
@@ -617,17 +632,14 @@ wfe <- function (formula, data, treat = "treat.name",
 
         }
 
-        ## var.cov <- Psi.hat.wfe * (1/nrow(X.tilde))
-        ## var.cov.fe <- Psi.hat.fe *(1/nrow(X.hat))
-
-        var.cov <- Psi.hat.wfe * (1/J.u)
-        var.cov.fe <- Psi.hat.fe *(1/J.u)
 
         if(dyad.se == TRUE){
-            ncty <- length(unique(c(data$imf1, data$imf2)))
-            var.cov <- Psi.hat.wfe * (1/ncty)
-            var.cov.fe <- Psi.hat.fe *(1/ncty)
-        }       
+            var.cov <- Psi.hat.wfe 
+            var.cov.fe <- Psi.hat.fe 
+        } else {
+            var.cov <- Psi.hat.wfe * (1/J.u)
+            var.cov.fe <- Psi.hat.fe *(1/J.u)
+        }
 
 
 ### traditional one way fixed effect results
