@@ -456,7 +456,7 @@ wfe <- function (formula, data, treat = "treat.name",
                     cty2 <- c2[which(dyadID == dyad.d)][1]
                     
                     idx.d <- which(dyadID == dyad.d)
-                    x.d <- X.tilde[idx.d,]
+                    x.d <- as.matrix(X.tilde[idx.d,])
                     e.d <- matrix(e.tilde[idx.d], ncol=1)
                     
                     ## consider all the other dyads in which country 1 or country
@@ -467,7 +467,8 @@ wfe <- function (formula, data, treat = "treat.name",
                     ## in case only one year is observed
                     if(is.null(nrow(x.d))){
                         x.d <- t(matrix(x.d, ncol=1))
-                        Omega.hat <- as.numeric(e.d^2)*t(x.d)%*%(x.d)
+                        e.d <- as.matrix(as.numeric(e.d))
+                        Omega.hat <- t(x.d) %*% e.d %*% t(e.d) %*% x.d
                     } else {
                         Omega.hat <- t(x.d) %*% e.d %*% t(e.d) %*% x.d
                     }
@@ -477,7 +478,7 @@ wfe <- function (formula, data, treat = "treat.name",
                         ## print(p)
                         dprime <- uniq.dprime[p]
                         idx.dprime <- which(dyadID == dprime)
-                        x.dprime <- X.tilde[idx.dprime,]
+                        x.dprime <- as.matrix(X.tilde[idx.dprime,])
                         e.dprime <- matrix(e.tilde[idx.dprime], ncol=1)
 
                         if(is.null(nrow((x.dprime)))){
