@@ -550,6 +550,7 @@ parallel_trends <- function(x, lag, lead, adjustment) {
 
 ## Caliper
 gaps_caliper <- function(x, lag, covariate = NULL, data,
+                         balance_type,
                          qoi) {
   
   colnames(data) <- c("time.id", "unit.id",
@@ -573,14 +574,20 @@ gaps_caliper <- function(x, lag, covariate = NULL, data,
     data$dependent <- data[c(covariate)]
   }
   if (qoi == "att") {
+    # for all the time periods that matched with pre-treatment L and 
+    # and are treated, gimme the standard deviation
     overall <- tapply(data$dependent[data$time.id %in% unique(x$V1) & data$treatment == 1],
                       data$time.id[data$time.id %in% unique(x$V1) & data$treatment == 1], sd)
   } else {
     overall <- tapply(data$dependent[data$time.id %in% unique(x$V1) & data$treatment == 0],
                       data$time.id[data$time.id %in% unique(x$V1) & data$treatment == 0], sd)
   }
+  if (balance_type == "parallel") {
+    return(abs(mean(gap/overall)))
+  } else {
+    return(abs(sd(gap/overall)))
+  }
   
-  return(abs(mean(gap/overall)))
   
 }
 
