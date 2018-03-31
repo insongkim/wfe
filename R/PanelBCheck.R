@@ -57,7 +57,7 @@ PanelBCheck <- function(matched_sets,
                                 each=lag+1+lead))
 
   # t <- tapply(df$val, df$x, quantile) # quantile hashed out
-  box <- boxplot(df$val ~ df$x, plot = F)
+  box <- boxplot(df$val ~ df$x, plot = F, range = 0)
  
   
   # # aggregate(val ~ x, data = df, FUN = quantile)
