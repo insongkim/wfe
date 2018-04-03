@@ -13,19 +13,23 @@ PanelBCheck <- function(matched_sets,
                           linetype = "dashed", colour = "blue"
                           ) {
   lag = matched_sets$lag;lead = matched_sets$max.lead;
-  treatment = matched_sets$treatment; dependent = matched_sets$dependent
-  
+  treatment = matched_sets$treatment; dependent = matched_sets$dependent;
+  method = matched_sets$method; covariate_names = matched_sets$covariate_names
   if (is.null(qoi)) {
     if (matched_sets$qoi == "att") {
       plot.materials <- lapply(matched_sets$`ATT_matches`, 
                                gaps_plot_tmp, lag = lag, lead = lead,
                                covariate = covariate,
+                               method = method,
+                               covariate_names = covariate_names,
                                qoi = "att", adjustment = adjustment,
                                data = matched_sets$data)
     } else if (matched_sets$qoi == "atc") {
       plot.materials <- lapply(matched_sets$`ATC_matches`, 
                                gaps_plot_tmp, lag = lag, lead = lead,
                                covariate = covariate,
+                               method = method,
+                               covariate_names = covariate_names,
                                qoi = "atc", adjustment = adjustment, 
                                data = matched_sets$data)
     } else {
@@ -36,12 +40,16 @@ PanelBCheck <- function(matched_sets,
       plot.materials <- lapply(matched_sets$`ATT_matches`, 
                                gaps_plot_tmp, lag = lag, lead = lead,
                                covariate = covariate,
+                               method = method,
+                               covariate_names = covariate_names,
                                qoi = "att", adjustment = adjustment,
                                data = matched_sets$data)
     } else if (qoi == "atc") {
       plot.materials <- lapply(matched_sets$`ATC_matches`, 
                                gaps_plot_tmp, lag = lag, lead = lead,
                                covariate = covariate,
+                               method = method,
+                               covariate_names = covariate_names,
                                qoi = "atc", adjustment = adjustment, 
                                data = matched_sets$data)
     } else {
@@ -81,7 +89,7 @@ PanelBCheck <- function(matched_sets,
     colnames(df2) <- c("Time to Treatment",
                        "Balance",
                        "Interquartiles")
-    output <- tapply(df$val, df$x, mean)
+    output <- tapply(df$val, df$x, mean, na.rm = T)
     output <- data.frame("time to treatment" = as.numeric(names(output)), 
                          "balance" = output)
     return(list("Mean_Balance" = output,

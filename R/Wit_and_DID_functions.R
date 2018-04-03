@@ -454,10 +454,18 @@ PanelDiDResult <- function(x, lag, lead){
 
 
 gaps_plot_tmp <- function(x, lag, lead, data, dependent,
-                      qoi, adjustment = TRUE,
+                      qoi, adjustment = TRUE, 
+                      covariate_names,
+                      method,
                       covariate = NULL) {
   colnames(data) <- c("time.id", "unit.id",
-                      "treatment", "dependent", covariate)
+                      "treatment", "dependent", covariate_names)
+  if (method == "Maha"|method == "Synth") {
+    x <- as.data.frame(x)
+    colnames(x)[5:length(x)] <- c(covariate_names,
+                                      "dependent",
+                                      "w.weight")
+  }
   treated.id <- x[x$V3 == 1 & x$V1 == (max(x$V1)-lead), ]$V2 # check this
   if (is.null(covariate)) {
     if (adjustment == TRUE) {
@@ -471,13 +479,14 @@ gaps_plot_tmp <- function(x, lag, lead, data, dependent,
     }
     
   } else {
+    x$V5 <- as.numeric(x[,c(covariate)])
     if (adjustment == TRUE){
       gap <- x$V5[x$V2 == treated.id] - 
         tapply(x$V5[x$V2 != treated.id] * x$w.weight[x$V2 != treated.id], 
                x$V1[x$V2 != treated.id], sum)
     } else {
-      gap <- x$V4[x$V2 == treated.id] - 
-        tapply(x$V4[x$V2 != treated.id], 
+      gap <- x$V5[x$V2 == treated.id] - 
+        tapply(x$V5[x$V2 != treated.id], 
                x$V1[x$V2 != treated.id], mean)
     }
    
@@ -491,21 +500,26 @@ gaps_plot_tmp <- function(x, lag, lead, data, dependent,
     overall <- rep(NA, (lag+1+lead))
     sub.data <- data[which(data$time.id <= max(x$V1) & 
                              data$time.id >= (max(x$V1)-lead-lag)),]
-    index.l <- as.numeric(rownames(sub.data[which(sub.data$time.id == (max(x$V1)-lead) & sub.data$treatment == 1), ]))
+    index.l <- 
+      as.numeric(rownames(sub.data[which(sub.data$time.id == (max(x$V1)-lead) & sub.data$treatment == 1), ]))
     for (i in 1:(lag + 1 + lead)) {
       overall[i] <- sd(sub.data$dependent[rownames(sub.data) %in% (index.l-lag-1 + i)])
+      overall[i] <- ifelse(overall[i] == 0, NA, overall[i]) # prevent inf
     }
    
   } else {
     overall <- rep(NA, (lag+1+lead))
     sub.data <- data[which(data$time.id <= max(x$V1) & 
                              data$time.id >= (max(x$V1)-lead-lag)),]
-    index.l <- as.numeric(rownames(sub.data[which(sub.data$time.id == (max(x$V1)-lead) & sub.data$treatment == 0), ]))
+    index.l <- 
+      as.numeric(rownames(sub.data[which(sub.data$time.id == (max(x$V1)-lead) & 
+                                                    sub.data$treatment == 0), ]))
     for (i in 1:(lag + 1 + lead)) {
       overall[i] <- sd(sub.data$dependent[rownames(sub.data) %in% (index.l-lag-1 + i)])
+      overall[i] <- ifelse(overall[i] == 0, NA, overall[i]) # prevent inf
     }
   }
- 
+  
   return(list("gap" = gap/overall,
                 "unit" = paste(treated.id, unique(x$V1)[lag + 1], sep = ",")))
 }
