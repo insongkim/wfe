@@ -10,6 +10,13 @@ Panel_vit <- function(x, lag, max.lead, method, M, weighting) {
   }
 }
 
+get_treated_set <- function(x) {
+  treated.id <- x[x$V3 == 1 & x$V1 == (max(x$V1)-lead), ]$V2 # check this
+  return(x[x$V2 == treated.id,])
+  
+}
+
+
 # synth_constReg_weight is borrowed from the package "synthR" written 
 # by Professor Soichiro Yamauchi 
 synth_constReg_weight <- function (Y_t, Y_c, T0, init = NULL, method = "solnp") 
@@ -457,17 +464,22 @@ gaps_plot_tmp <- function(x, lag, lead, data, dependent,
                       qoi, adjustment = TRUE, 
                       covariate_names,
                       method,
+                      treated_set,
                       covariate = NULL) {
-  colnames(data) <- c("time.id", "unit.id",
-                      "treatment", "dependent", covariate_names)
+  treated_set <- treated_set
+  # colnames(data) <- c("time.id", "unit.id",
+  #                     "treatment", "dependent", covariate_names)
   if (method == "Maha"|method == "Synth") {
     x <- as.data.frame(x)
     colnames(x)[5:length(x)] <- c(covariate_names,
                                       "dependent",
                                       "w.weight")
+    colnames(treated_set)[5:(length(treated_set)-3)] <- 
+      covariate_names
   }
   treated.id <- x[x$V3 == 1 & x$V1 == (max(x$V1)-lead), ]$V2 # check this
   if (is.null(covariate)) {
+    treated_set$V5 <- treated_set$V4
     if (adjustment == TRUE) {
       gap <- x$V4[x$V2 == treated.id] - 
         tapply(x$V4[x$V2 != treated.id] * x$w.weight[x$V2 != treated.id], 
@@ -480,6 +492,7 @@ gaps_plot_tmp <- function(x, lag, lead, data, dependent,
     
   } else {
     x$V5 <- as.numeric(x[,c(covariate)])
+    treated_set$V5 <- as.numeric(treated_set[,c(covariate)])
     if (adjustment == TRUE){
       gap <- x$V5[x$V2 == treated.id] - 
         tapply(x$V5[x$V2 != treated.id] * x$w.weight[x$V2 != treated.id], 
@@ -491,33 +504,34 @@ gaps_plot_tmp <- function(x, lag, lead, data, dependent,
     }
    
   }
-  if (is.null(covariate) == FALSE) {
-    data$dependent <- data[covariate][,1]
-  }
+  # if (is.null(covariate) == FALSE) {
+  #   data$dependent <- data[covariate][,1]
+  # }
   # divide the gap by the sd of the outcome variable among all treated units 
   # in that treatment time period.
   if (qoi == "att") {
-    overall <- rep(NA, (lag+1+lead))
-    sub.data <- data[which(data$time.id <= max(x$V1) & 
-                             data$time.id >= (max(x$V1)-lead-lag)),]
-    index.l <- 
-      as.numeric(rownames(sub.data[which(sub.data$time.id == (max(x$V1)-lead) & sub.data$treatment == 1), ]))
-    for (i in 1:(lag + 1 + lead)) {
-      overall[i] <- sd(sub.data$dependent[rownames(sub.data) %in% (index.l-lag-1 + i)])
-      overall[i] <- ifelse(overall[i] == 0, NA, overall[i]) # prevent inf
-    }
+    # overall <- rep(NA, (lag+1+lead))
+    overall <- tapply(treated_set$V5, treated_set$big_L, sd, na.rm = T)
+    # sub.data <- data[which(data$time.id <= max(x$V1) & 
+    #                          data$time.id >= (max(x$V1)-lead-lag)),]
+    # index.l <- 
+    #   as.numeric(rownames(sub.data[which(sub.data$time.id == (max(x$V1)-lead) & sub.data$treatment == 1), ]))
+    # for (i in 1:(lag + 1 + lead)) {
+    #   overall[i] <- sd(sub.data$dependent[rownames(sub.data) %in% (index.l-lag-1 + i)])
+    #   overall[i] <- ifelse(overall[i] == 0, NA, overall[i]) # prevent inf
+    # }
    
   } else {
-    overall <- rep(NA, (lag+1+lead))
-    sub.data <- data[which(data$time.id <= max(x$V1) & 
-                             data$time.id >= (max(x$V1)-lead-lag)),]
-    index.l <- 
-      as.numeric(rownames(sub.data[which(sub.data$time.id == (max(x$V1)-lead) & 
-                                                    sub.data$treatment == 0), ]))
-    for (i in 1:(lag + 1 + lead)) {
-      overall[i] <- sd(sub.data$dependent[rownames(sub.data) %in% (index.l-lag-1 + i)])
-      overall[i] <- ifelse(overall[i] == 0, NA, overall[i]) # prevent inf
-    }
+    overall <- tapply(treated_set$V5, treated_set$big_L, sd, na.rm = T)
+    # sub.data <- data[which(data$time.id <= max(x$V1) & 
+    #                          data$time.id >= (max(x$V1)-lead-lag)),]
+    # index.l <- 
+    #   as.numeric(rownames(sub.data[which(sub.data$time.id == (max(x$V1)-lead) & 
+    #                                                 sub.data$treatment == 0), ]))
+    # for (i in 1:(lag + 1 + lead)) {
+    #   overall[i] <- sd(sub.data$dependent[rownames(sub.data) %in% (index.l-lag-1 + i)])
+    #   overall[i] <- ifelse(overall[i] == 0, NA, overall[i]) # prevent inf
+    # }
   }
   
   return(list("gap" = gap/overall,

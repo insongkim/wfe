@@ -15,19 +15,36 @@ PanelBCheck <- function(matched_sets,
   lag = matched_sets$lag;lead = matched_sets$max.lead;
   treatment = matched_sets$treatment; dependent = matched_sets$dependent;
   method = matched_sets$method; covariate_names = matched_sets$covariate_names
+
   if (is.null(qoi)) {
     if (matched_sets$qoi == "att") {
+      treated_set <- as.data.frame(data.table::rbindlist(lapply(matched_sets$`ATT_matches`, 
+                                                                function(x) {
+                                                                  treated.id <- x[x$V3 == 1 & x$V1 == (max(x$V1)-lead), ]$V2 # check this
+                                                                  return(x[x$V2 == treated.id,])
+                                                                  
+                                                                })))
+      treated_set$big_L <- rep(1:(lag+1+lead), nrow(treated_set)/(lag+1+lead))
       plot.materials <- lapply(matched_sets$`ATT_matches`, 
                                gaps_plot_tmp, lag = lag, lead = lead,
                                covariate = covariate,
+                               treated_set = treated_set,
                                method = method,
                                covariate_names = covariate_names,
                                qoi = "att", adjustment = adjustment,
                                data = matched_sets$data)
     } else if (matched_sets$qoi == "atc") {
+      treated_set <- as.data.frame(data.table::rbindlist(lapply(matched_sets$`ATC_matches`, 
+                                                                function(x) {
+                                                                  treated.id <- x[x$V3 == 1 & x$V1 == (max(x$V1)-lead), ]$V2 # check this
+                                                                  return(x[x$V2 == treated.id,])
+                                                                  
+                                                                })))
+      treated_set$big_L <- rep(1:(lag+1+lead), nrow(treated_set)/(lag+1+lead))
       plot.materials <- lapply(matched_sets$`ATC_matches`, 
                                gaps_plot_tmp, lag = lag, lead = lead,
                                covariate = covariate,
+                               treated_set = treated_set,
                                method = method,
                                covariate_names = covariate_names,
                                qoi = "atc", adjustment = adjustment, 
@@ -37,17 +54,33 @@ PanelBCheck <- function(matched_sets,
     }
   } else {
     if (qoi == "att") {
+      treated_set <- as.data.frame(data.table::rbindlist(lapply(matched_sets$`ATT_matches`, 
+                                                                function(x) {
+                                                                  treated.id <- x[x$V3 == 1 & x$V1 == (max(x$V1)-lead), ]$V2 # check this
+                                                                  return(x[x$V2 == treated.id,])
+                                                                  
+                                                                })))
+      treated_set$big_L <- rep(1:(lag+1+lead), nrow(treated_set)/(lag+1+lead))
       plot.materials <- lapply(matched_sets$`ATT_matches`, 
                                gaps_plot_tmp, lag = lag, lead = lead,
                                covariate = covariate,
+                               treated_set = treated_set,
                                method = method,
                                covariate_names = covariate_names,
                                qoi = "att", adjustment = adjustment,
                                data = matched_sets$data)
     } else if (qoi == "atc") {
+      treated_set <- as.data.frame(data.table::rbindlist(lapply(matched_sets$`ATC_matches`, 
+                                                                function(x) {
+                                                                  treated.id <- x[x$V3 == 1 & x$V1 == (max(x$V1)-lead), ]$V2 # check this
+                                                                  return(x[x$V2 == treated.id,])
+                                                                  
+                                                                })))
+      treated_set$big_L <- rep(1:(lag+1+lead), nrow(treated_set)/(lag+1+lead))
       plot.materials <- lapply(matched_sets$`ATC_matches`, 
                                gaps_plot_tmp, lag = lag, lead = lead,
                                covariate = covariate,
+                               treated_set = treated_set,
                                method = method,
                                covariate_names = covariate_names,
                                qoi = "atc", adjustment = adjustment, 
