@@ -5,7 +5,8 @@ PanelMatch <- function(lag, max.lead, time.id = "year", qoi = "ate",
                            data,
                            weighting = FALSE,
                            M = 3, covariate.only = FALSE,
-                           method = NULL) {
+                           method = NULL,
+                           naive = FALSE) {
   
   ## Warning for missing unit & time index
   if (missing(unit.id))
@@ -81,7 +82,12 @@ PanelMatch <- function(lag, max.lead, time.id = "year", qoi = "ate",
     
     ### cleaning the output from cpp ###
     # delete both higher level and lower level null entries
-    smallerlist <- lapply(Filter(function (x) !is.null(x), findDDmatched2(L = lag, F = max.lead, dmatrix)), delete.NULLs) 
+    if (naive == FALSE) {
+      smallerlist <- lapply(Filter(function (x) !is.null(x), findDDmatched2(L = lag, F = max.lead, dmatrix)), delete.NULLs) 
+    } else {
+      smallerlist <- lapply(Filter(function (x) !is.null(x), wfe::findDDNaive(L = lag, F = max.lead, dmatrix)), delete.NULLs) 
+    }
+   
     # further cleaning
     smallerlist <- Filter(function (x) length(x) > 0, smallerlist)
     # use function dframelist.rb_dup to turn every list element into a data.frame
@@ -228,7 +234,12 @@ PanelMatch <- function(lag, max.lead, time.id = "year", qoi = "ate",
         
         ### cleaning the output from cpp ###
         # delete both higher level and lower level null entries
-        smallerlist <- lapply(Filter(function (x) !is.null(x), findDDmatched2(L = lag, F = max.lead, dmatrix)), delete.NULLs) 
+        if (naive == FALSE) {
+          smallerlist <- lapply(Filter(function (x) !is.null(x), findDDmatched2(L = lag, F = max.lead, dmatrix)), delete.NULLs) 
+        } else {
+          smallerlist <- lapply(Filter(function (x) !is.null(x), findDDNaive(L = lag, F = max.lead, dmatrix)), delete.NULLs) 
+        }
+        
         # further cleaning
         smallerlist <- Filter(function (x) length(x) > 0, smallerlist)
         # use function dframelist.rb_dup to turn every list element into a data.frame
@@ -364,7 +375,12 @@ PanelMatch <- function(lag, max.lead, time.id = "year", qoi = "ate",
           if (qoi == "ate") {
             ### cleaning the output from cpp ###
             # delete both higher level and lower level null entries
-            smallerlist <- lapply(Filter(function (x) !is.null(x), findDDmatched2(L = lag, F = max.lead, dmatrix)), delete.NULLs) 
+            if (naive == FALSE) {
+              smallerlist <- lapply(Filter(function (x) !is.null(x), findDDmatched2(L = lag, F = max.lead, dmatrix)), delete.NULLs) 
+            } else {
+              smallerlist <- lapply(Filter(function (x) !is.null(x), findDDNaive(L = lag, F = max.lead, dmatrix)), delete.NULLs) 
+            }
+            
             # further cleaning
             smallerlist <- Filter(function (x) length(x) > 0, smallerlist)
             # use function dframelist.rb_dup to turn every list element into a data.frame
@@ -455,7 +471,11 @@ PanelMatch <- function(lag, max.lead, time.id = "year", qoi = "ate",
             
             ### cleaning the output from cpp ###
             # delete both higher level and lower level null entries
-            smallerlist <- lapply(Filter(function (x) !is.null(x), findDDmatched2(L = lag, F = max.lead, dmatrix)), delete.NULLs) 
+            if (naive == FALSE) {
+              smallerlist <- lapply(Filter(function (x) !is.null(x), findDDmatched2(L = lag, F = max.lead, dmatrix)), delete.NULLs) 
+            } else {
+              smallerlist <- lapply(Filter(function (x) !is.null(x), findDDNaive(L = lag, F = max.lead, dmatrix)), delete.NULLs) 
+            }
             # further cleaning
             smallerlist <- Filter(function (x) length(x) > 0, smallerlist)
             # use function dframelist.rb_dup to turn every list element into a data.frame

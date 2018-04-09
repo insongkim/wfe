@@ -21,3 +21,7 @@ findDDmatched2 <- function(L, F, x1) {
     .Call('_wfe_findDDmatched2', PACKAGE = 'wfe', L, F, x1)
 }
 
+findDDNaive <- function(L, F, x1) {
+    .Call('_wfe_findDDNaive', PACKAGE = 'wfe', L, F, x1)
+}
+

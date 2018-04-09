@@ -39,6 +39,7 @@ extern void XXiSum(void *, void *, void *, void *, void *, void *);
 /* .Call calls */
 extern SEXP _wfe_all_sug(SEXP);
 extern SEXP _wfe_findDDmatched2(SEXP, SEXP, SEXP);
+extern SEXP _wfe_findDDNaive(SEXP, SEXP, SEXP);
 extern SEXP _wfe_FindMatches(SEXP, SEXP, SEXP);
 extern SEXP _wfe_rbind_c(SEXP, SEXP);
 extern SEXP _wfe_sumCpp(SEXP);
@@ -77,6 +78,7 @@ static const R_CMethodDef CEntries[] = {
 static const R_CallMethodDef CallEntries[] = {
     {"_wfe_all_sug",        (DL_FUNC) &_wfe_all_sug,        1},
     {"_wfe_findDDmatched2", (DL_FUNC) &_wfe_findDDmatched2, 3},
+    {"_wfe_findDDNaive", (DL_FUNC) &_wfe_findDDNaive, 3},
     {"_wfe_FindMatches",    (DL_FUNC) &_wfe_FindMatches,    3},
     {"_wfe_rbind_c",        (DL_FUNC) &_wfe_rbind_c,        2},
     {"_wfe_sumCpp",         (DL_FUNC) &_wfe_sumCpp,         1},

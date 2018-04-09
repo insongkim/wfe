@@ -14,7 +14,7 @@ export(wfe, pwfe,  findMatched2, findMatched,syn_DID, syn_DID_MSMD,
 
 importFrom(Rcpp, evalCpp)
 ## exportPattern("^[[:alpha:]]+")
-export(FindMatches, wfe, findDDmatched2)
+export(FindMatches, wfe, findDDmatched2, findDDNaive)
 
 
 # import functions used for PanelMatch and others
