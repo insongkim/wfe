@@ -514,11 +514,21 @@ wfe <- function (formula, data, treat = "treat.name",
 
         } else if ((hetero.se == TRUE) & (auto.se == TRUE)) {# Default is Arellano
             std.error <- "Heteroscedastic / Autocorrelation Robust Standard Error"
-            
+
             ## 1. arbitrary autocorrelation as well as heteroskedasticity (Eq 12)
 
             ## degrees of freedom adjustment
-            df.adjust <- 1/(nrow(X.tilde)) * ((nrow(X.tilde)-1)/(nrow(X.tilde)-J.u-p)) * (J.u/(J.u-1))
+            ## df.adjust <- 1/(nrow(X.tilde)) * ((nrow(X.tilde)-1)/(nrow(X.tilde)-J.u-p)) * (J.u/(J.u-1))
+
+            ## e <- environment()
+            ## save(file = "temp.RData", list = ls(), env = e)
+            
+            Nstar <- length(which(data$W.it !=0)) # observations with non-zero weights
+            J.u2 <- length(unique(data$u.index[which(data$W.it !=0)])) # number of units with non-zero weights
+            df.adjust <- 1/J.u2 * (J.u2/(J.u2-1)) * (Nstar-1)/(Nstar-J.u2-p+1)
+            cat("check:", Nstar, J.u2, p, "\n")
+            cat("df adjust:", df.adjust, "\n")
+
             
             Omega.hat.HAC <- OmegaHatHAC(nrow(X.tilde), p, wdm.unit, J.u, X.tilde, u.tilde)
             Omega.hat.HAC <- matrix(Omega.hat.HAC, nrow = p, ncol = p)
@@ -528,7 +538,7 @@ wfe <- function (formula, data, treat = "treat.name",
             Omega.hat.fe.HAC <- OmegaHatHAC(nrow(X.hat), p, wdm.unit, J.u, X.hat, u.hat)
             Omega.hat.fe.HAC <- matrix(Omega.hat.fe.HAC, nrow = p, ncol = p)
             ## Omega.hat.fe.HAC <- (1/(nrow(X.hat))) * Omega.hat.fe.HAC # without degree of freedom adjustment
-            Omega.hat.fe.HAC <- df.adjust * Omega.hat.fe.HAC
+            Omega.hat.fe.HAC <- (1/J.u) * Omega.hat.fe.HAC
 
             ## Psi.hat.wfe <- (nrow(X.tilde) * ginv.XX.tilde) %*% Omega.hat.HAC %*% (nrow(X.tilde) * ginv.XX.tilde)
             ## Psi.hat.fe <- (nrow(X.hat) * ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (nrow(X.hat) * ginv.XX.hat)
@@ -551,7 +561,9 @@ wfe <- function (formula, data, treat = "treat.name",
             ## Omega.hat.HC <- (1/(nrow(X.tilde) - J.u - p))*(crossprod((X.tilde*diag.ee.tilde), X.tilde)) 
             ## Omega.hat.fe.HC <- (1/(nrow(X.hat) - J.u - p))*(crossprod((X.hat*diag.ee.hat), X.hat))  
 
-            Omega.hat.HC <- (1/J.u)*(crossprod((X.tilde*diag.ee.tilde), X.tilde)) 
+            J.u2 <- length(unique(data$u.index[which(data$W.it !=0)]))
+            
+            Omega.hat.HC <- (1/J.u2)*(crossprod((X.tilde*diag.ee.tilde), X.tilde)) 
             Omega.hat.fe.HC <- (1/J.u)*(crossprod((X.hat*diag.ee.hat), X.hat))  
             
             
