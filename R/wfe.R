@@ -518,16 +518,9 @@ wfe <- function (formula, data, treat = "treat.name",
             ## 1. arbitrary autocorrelation as well as heteroskedasticity (Eq 12)
 
             ## degrees of freedom adjustment
-            ## df.adjust <- 1/(nrow(X.tilde)) * ((nrow(X.tilde)-1)/(nrow(X.tilde)-J.u-p)) * (J.u/(J.u-1))
-
-            ## e <- environment()
-            ## save(file = "temp.RData", list = ls(), env = e)
-            
-            Nstar <- length(which(data$W.it !=0)) # observations with non-zero weights
-            J.u2 <- length(unique(data$u.index[which(data$W.it !=0)])) # number of units with non-zero weights
-            df.adjust <- 1/J.u2 * (J.u2/(J.u2-1)) * (Nstar-1)/(Nstar-J.u2-p+1)
-            cat("check:", Nstar, J.u2, p, "\n")
-            cat("df adjust:", df.adjust, "\n")
+            Nnonzero <- length(which(data$W.it !=0))
+            K <- nc-3
+            df.adjust <- 1/J.u * (J.u/(J.u-1)) * (Nnonzero/(Nnonzero-K+1))
 
             
             Omega.hat.HAC <- OmegaHatHAC(nrow(X.tilde), p, wdm.unit, J.u, X.tilde, u.tilde)
@@ -561,9 +554,8 @@ wfe <- function (formula, data, treat = "treat.name",
             ## Omega.hat.HC <- (1/(nrow(X.tilde) - J.u - p))*(crossprod((X.tilde*diag.ee.tilde), X.tilde)) 
             ## Omega.hat.fe.HC <- (1/(nrow(X.hat) - J.u - p))*(crossprod((X.hat*diag.ee.hat), X.hat))  
 
-            J.u2 <- length(unique(data$u.index[which(data$W.it !=0)]))
             
-            Omega.hat.HC <- (1/J.u2)*(crossprod((X.tilde*diag.ee.tilde), X.tilde)) 
+            Omega.hat.HC <- (1/J.u)*(crossprod((X.tilde*diag.ee.tilde), X.tilde)) 
             Omega.hat.fe.HC <- (1/J.u)*(crossprod((X.hat*diag.ee.hat), X.hat))  
             
             
@@ -611,9 +603,6 @@ wfe <- function (formula, data, treat = "treat.name",
                 }
             }
             
-            ## Psi.hat.wfe <- (nrow(X.tilde) * ginv.XX.tilde) %*% Omega.hat.HC %*% (nrow(X.tilde) * ginv.XX.tilde)
-            ## Psi.hat.fe <- (nrow(X.hat) * ginv.XX.hat) %*% Omega.hat.fe.HC %*% (nrow(X.hat) * ginv.XX.hat)
-
             Psi.hat.wfe <- (J.u*ginv.XX.tilde) %*% Omega.hat.HC %*% (J.u*ginv.XX.tilde)
             Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Omega.hat.fe.HC %*% (J.u*ginv.XX.hat)
 
@@ -654,19 +643,6 @@ wfe <- function (formula, data, treat = "treat.name",
             var.cov.fe <- Psi.hat.fe *(1/J.u)
         }
 
-
-### traditional one way fixed effect results
-
-        
-        ## if (verbose) {
-        ##   cat("Traditional one-way fixed effect\n")
-        ##   print(summary(fit.ols))
-        ##   cat("Robust Standard errors for Standard FE \n")
-        ##   print(sqrt(diag(var.cov.fe)))
-        ##   flush.console()
-        
-        ## }
-        
 
 ### White (1980) Test: Theorem 4
 
