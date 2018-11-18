@@ -516,44 +516,36 @@ wfe <- function (formula, data, treat = "treat.name",
             std.error <- "Heteroscedastic / Autocorrelation Robust Standard Error"
 
             ## 1. arbitrary autocorrelation as well as heteroskedasticity (Eq 12)
-
-            ## degrees of freedom adjustment
-            Nnonzero <- length(which(data$W.it !=0))
-            K <- nc-3
-            df.adjust <- 1/J.u * (J.u/(J.u-1)) * (Nnonzero/(Nnonzero-K+1))
-
             
             Omega.hat.HAC <- OmegaHatHAC(nrow(X.tilde), p, wdm.unit, J.u, X.tilde, u.tilde)
             Omega.hat.HAC <- matrix(Omega.hat.HAC, nrow = p, ncol = p)
             ## Omega.hat.HAC <- (1/(nrow(X.tilde)))* Omega.hat.HAC # without degree of freedom adjustment 
-            Omega.hat.HAC <- df.adjust * Omega.hat.HAC
+            Omega.hat.HAC <- 1/J.u * Omega.hat.HAC
             
             Omega.hat.fe.HAC <- OmegaHatHAC(nrow(X.hat), p, wdm.unit, J.u, X.hat, u.hat)
             Omega.hat.fe.HAC <- matrix(Omega.hat.fe.HAC, nrow = p, ncol = p)
             ## Omega.hat.fe.HAC <- (1/(nrow(X.hat))) * Omega.hat.fe.HAC # without degree of freedom adjustment
-            Omega.hat.fe.HAC <- (1/J.u) * Omega.hat.fe.HAC
+            Omega.hat.fe.HAC <- 1/J.u * Omega.hat.fe.HAC
 
             ## Psi.hat.wfe <- (nrow(X.tilde) * ginv.XX.tilde) %*% Omega.hat.HAC %*% (nrow(X.tilde) * ginv.XX.tilde)
             ## Psi.hat.fe <- (nrow(X.hat) * ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (nrow(X.hat) * ginv.XX.hat)
 
             Psi.hat.wfe <- (J.u*ginv.XX.tilde) %*% Omega.hat.HAC %*% (J.u*ginv.XX.tilde)
             Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (J.u*ginv.XX.hat)
+
+            ## degrees of freedom adjustment
+            Nnonzero <- length(which(data$W.it !=0))
+            K <- nc-3
+            dfHAC <- (J.u/(J.u-1)) * (Nnonzero/(Nnonzero-K+1))
+            
+            Psi.hat.wfe <- dfHAC * Psi.hat.wfe
+            Psi.hat.fe <- dfHAC * Psi.hat.fe
+
             
         } else if ( (hetero.se == TRUE) & (auto.se == FALSE) ) {# independence across observations but heteroskedasticity
             std.error <- "Heteroscedastic Robust Standard Error"
 
             ## 2. independence across observations but heteroskedasticity (Eq 11)
-            
-            ## Omega.hat.HC <- OmegaHatHC(nrow(X.tilde), p, wdm.unit, J.u, X.tilde, u.tilde)
-            ## Omega.hat.HC <- matrix(Omega.hat.HC, nrow = p, ncol = p)
-            ## ## same as the following matrix multiplication but slower
-            ## ## Omega.hat.he <- t(X.tilde) %*% diag(c(u.tilde)^2, nrow=nrow(X.tilde)) %*% X.tilde
-            ## Omega.hat.HC <- (1/(nrow(X.tilde) - J.u - p)) * Omega.hat.HC
-
-
-            ## Omega.hat.HC <- (1/(nrow(X.tilde) - J.u - p))*(crossprod((X.tilde*diag.ee.tilde), X.tilde)) 
-            ## Omega.hat.fe.HC <- (1/(nrow(X.hat) - J.u - p))*(crossprod((X.hat*diag.ee.hat), X.hat))  
-
             
             Omega.hat.HC <- (1/J.u)*(crossprod((X.tilde*diag.ee.tilde), X.tilde)) 
             Omega.hat.fe.HC <- (1/J.u)*(crossprod((X.hat*diag.ee.hat), X.hat))  
