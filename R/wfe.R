@@ -638,19 +638,23 @@ wfe <- function (formula, data, treat = "treat.name",
 
 ### White (1980) Test: Theorem 4
 
+        Nnonzero <- length(which(data$W.it !=0))
+
         diag.ee <- c(u.hat) * c(u.tilde)
         
         Lambda.hat1 <-  1/((nrow(X.hat) - J.u - p))* (crossprod((X.hat*diag.ee), X.tilde))  
         Lambda.hat2 <-  1/((nrow(X.tilde) - J.u - p))* (crossprod((X.tilde*diag.ee), X.hat))  
 
 
-        Phi.hat <- Psi.hat.wfe + Psi.hat.fe - (nrow(X.hat)*ginv.XX.hat) %*% Lambda.hat1 %*% (nrow(X.tilde)*ginv.XX.tilde) - (nrow(X.tilde)*ginv.XX.tilde) %*% Lambda.hat2 %*% (nrow(X.hat)*ginv.XX.hat)
+        Phi.hat <- Psi.hat.wfe + Psi.hat.fe - (Nnonzero*ginv.XX.hat) %*% Lambda.hat1 %*% (Nnonzero*ginv.XX.tilde) - (Nnonzero*ginv.XX.tilde) %*% Lambda.hat2 %*% (Nnonzero*ginv.XX.hat)
 
         rm(Lambda.hat1, Lambda.hat2)
         gc()
 
         ## White test: null hypothesis is ``no misspecification''
-        white.stat <- nrow(X.hat) * t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)
+        ## white.stat <- nrow(X.hat) * t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)
+        white.stat <- Nnonzero * t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)
+        
         test.null <- pchisq(as.numeric(white.stat), df=p, lower.tail=F) < White.alpha
         white.p <- pchisq(as.numeric(white.stat), df=p, lower.tail=F)
 
