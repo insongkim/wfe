@@ -6,7 +6,7 @@ Date: 2017-07-18
 Authors@R: c(
   person("In Song", "Kim", email = "insong@mit.edu", role = c("aut", "cre")),
   person("Erik", "Wang", email = "haixiaow@princeton.edu", role = c("aut")),
-  person("Kosuke", "Imai", email = "kimai@Princeton.edu", role = c("aut"))
+  person("Kosuke", "Imai", email = "imai@Harvard.edu", role = c("aut"))
   )
 Description: Provides a computationally efficient way of fitting
 	     weighted linear fixed effects estimators for causal
