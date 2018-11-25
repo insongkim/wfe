@@ -103,7 +103,7 @@ wfe(formula, data, treat = "treat.name",
   }
   
   \item{White.alpha}{level of functional specification test. See White
-    (1980) and Imai and Kim (2016). The default is \code{0.05}.
+    (1980) and Imai and Kim (2018). The default is \code{0.05}.
   }
 
   \item{verbose}{logical. If \code{TRUE}, helpful messages along with
@@ -200,11 +200,10 @@ wfe(formula, data, treat = "treat.name",
 
 }
 
-\references{Imai, Kosuke and In Song Kim. (2016) ``When Should We Use
-  Linear Fixed Effects Regression Models for Causal Inference with
-  Longitudinal Data?'' Technical Report, Department of Politics,
-  Princeton University.  available at
-  \url{http://imai.princeton.edu/research/FEmatch.html}
+\references{Imai, Kosuke and In Song Kim. (2018) ``When Should We Use
+Unit Fixed Effects Regression Models for Causal Inference with
+Longitudinal Data?" American Journal of Political Science,
+Forthcoming.
 
   Aronow, Peter M., Cyrus Samii, and Valentina A. Assenova (2015) ``Cluster–robust
   Variance Estimation for Dyadic Data." Political Analysis 23, no. 4, 564--577.
@@ -368,6 +367,6 @@ mod.did2$coef[1] ==  mod.did$coef[1]
 
 
 \author{In Song Kim, Massachusetts Institute of Technology, \email{insong@mit.edu}		
-	and Kosuke Imai, Princeton University, \email{kimai@princeton.edu}	}
+	and Kosuke Imai, Princeton University, \email{imai@harvard.edu}	}
 
 \keyword{regression}

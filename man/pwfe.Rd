@@ -146,7 +146,7 @@ pwfe(formula, treat = "treat.name", outcome, data, pscore = NULL,
   score will be estimated on entire data at once.
 
   The estimated propensity scores will be used to transform the
-  \code{outcome} variable as described in Imai and Kim (2012).
+  \code{outcome} variable as described in Imai and Kim (2018).
 
   \code{pwfe} calculates weights based on different underlying causal
   quantity of interest: Average Treatment Effect (\code{qoi = "ate"}) or
@@ -164,11 +164,10 @@ pwfe(formula, treat = "treat.name", outcome, data, pscore = NULL,
 
 }
 
-\references{ Imai, Kosuke and In Song Kim. (2016) ``When Should We Use
-  Linear Fixed Effects Regression Models for Causal Inference with
-  Longitudinal Data?'' Technical Report, Department of Politics,
-  Princeton University.  available at
-  \url{http://imai.princeton.edu/research/FEmatch.html}
+\references{ Imai, Kosuke and In Song Kim. (2018) ``When Should We Use
+Unit Fixed Effects Regression Models for Causal Inference with
+Longitudinal Data?" American Journal of Political Science,
+Forthcoming.
 
   Stock, James and Mark Watson. (2008) ``Heteroskedasticity-Robust
   Standard Errors for Fixed Effect Panel Data Regression'' Econometrica,
@@ -304,8 +303,8 @@ summary(mod.ps)
 
 }
 
-\author{Kosuke Imai, Princeton University, \email{kimai@princeton.edu}
-  and In Song Kim, Princeton University, \email{insong@princeton.edu}}
+\author{In Song Kim, Massachusetts Institute of Technology, \email{insong@mit.edu}		
+	and Kosuke Imai, Princeton University, \email{imai@harvard.edu}	}
 
 \keyword{regression}
 
