@@ -27,7 +27,7 @@ Imports:
     Matrix,
     MASS,
     methods
-Depends: R (>= 2.11.0)
+Depends: R (>= 3.2.0)
 Encoding: UTF-8
 LazyData: true
 BugReports: https://github.com/insongkim/wfe/issues

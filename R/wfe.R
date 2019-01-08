@@ -840,7 +840,7 @@ wfe <- function (formula, data, treat = "treat.name",
             ## this takes time: should be made more efficient
             Tdummy <- array(0,dim=c(0,length(uniq.t)))
             for (j in 1:nrow(t)) {
-                Tdummy <- rBind(Tdummy,  Diagonal(x = t[j,], n=length(uniq.t)))
+                Tdummy <- rbind(Tdummy,  Diagonal(x = t[j,], n=length(uniq.t)))
             }
 
             ## when panel is unbalanced there will be rows of zeros
@@ -984,13 +984,13 @@ wfe <- function (formula, data, treat = "treat.name",
                 ## last <- ncol(Tdummy) 
                 ## Tdummy <- Tdummy[,-last]
                 ## adding a column of 1000's for numerical stability of ginv
-                Tdummy <- cBind(Tdummy, rep(1000, nrow(Tdummy)))
+                Tdummy <- cbind(Tdummy, rep(1000, nrow(Tdummy)))
                 gc()
             } else {
                 last <- ncol(Tdummy)
                 Tdummy <- Tdummy[,-last] # for identification exclude the last year dummy
                 ## adding a column of 1's for numerical stability of ginv
-                Tdummy <- cBind(Tdummy, rep(1000, nrow(Tdummy)))
+                Tdummy <- cbind(Tdummy, rep(1000, nrow(Tdummy)))
                 gc()
             }
 
@@ -1004,7 +1004,7 @@ wfe <- function (formula, data, treat = "treat.name",
 
             
             ## combining unit dummy matrix and X matrix
-            D <- Matrix(cBind(Udummy, Tdummy))
+            D <- Matrix(cbind(Udummy, Tdummy))
             ## Note: Tdummy part does not have zero columns, but Udummy part has it
             ## will be addressed thie issue below by n.zero
             
@@ -1259,8 +1259,8 @@ wfe <- function (formula, data, treat = "treat.name",
 
 
             YX.starL <- list()
-            YX.starL[[1]] <- cBind(y.starL[[1]], x.starL[[1]])
-            YX.starL[[2]] <- cBind(y.starL[[2]], x.starL[[2]])
+            YX.starL[[1]] <- cbind(y.starL[[1]], x.starL[[1]])
+            YX.starL[[2]] <- cbind(y.starL[[2]], x.starL[[2]])
             rm(y.starL, x.starL)
             gc()
             
