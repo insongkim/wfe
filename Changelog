@@ -8,3 +8,4 @@ version      date  description
 1.5	     07/03/16  Implementation of Difference-in-Differences with nearest neighbor matching on pre-treatment outcome variables
 1.6	     07/18/17  standard error with degress of freedom correction (two-way)
 1.7	     11/25/18  standard error with degress of freedom correction (one-way)
+1.8	     01/09/19  minor update using cbind() and rbind() instead of cBind() and rBind()
