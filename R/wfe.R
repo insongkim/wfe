@@ -1479,9 +1479,9 @@ wfe <- function (formula, data, treat = "treat.name",
                 ## White test: null hypothesis is ``no misspecification''
                 ## -----------------------------------------------------
 
-                ## white.stat <- as.double(Re(n.nonzero.units * t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)))
+                white.stat <- as.double(Re(n.nonzero.units * t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)))
 
-                white.stat <- as.double(Re(nrow(X.hat) * t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)))
+                ## white.stat <- as.double(Re(nrow(X.hat) * t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)))
                 
                 ## white.stat <- as.double(Re(t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)))
                 test.null <- pchisq(as.numeric(white.stat), df=p, lower.tail=F) < White.alpha
