@@ -1466,19 +1466,12 @@ wfe <- function (formula, data, treat = "treat.name",
                 
                 diag.ee <- c(u.hat) * c(e.tilde)
                 
-                ## Lambda.hat1 <-  1/((nrow(X.hat)))* (crossprod((X.hat*diag.ee), X.tilde))  
-                ## Lambda.hat2 <-  1/((nrow(X.tilde)))* (crossprod((X.tilde*diag.ee), X.hat))  
-                ## Phi.hat <- Psi.hat.wfe + Psi.hat.fe - 
-                ##     df.correction*(((nrow(X.hat)*ginv.XX.hat) %*% Lambda.hat1 %*% (nrow(X.tilde)*ginv.XX.tilde)) +
-                ##     ((nrow(X.tilde)*ginv.XX.tilde) %*% Lambda.hat2 %*% (nrow(X.hat)*ginv.XX.hat)))
-
-                Lambda.hat1 <-  1/((nrow(X.tilde)))* (crossprod((X.hat*diag.ee), X.tilde))  
+                Lambda.hat1 <-  1/((nrow(X.hat)))* (crossprod((X.hat*diag.ee), X.tilde))  
                 Lambda.hat2 <-  1/((nrow(X.tilde)))* (crossprod((X.tilde*diag.ee), X.hat))  
                 Phi.hat <- Psi.hat.wfe + Psi.hat.fe - 
-                    df.correction*(((nrow(X.tilde)*ginv.XX.hat) %*% Lambda.hat1 %*% (nrow(X.tilde)*ginv.XX.tilde)) +
-                    ((nrow(X.tilde)*ginv.XX.tilde) %*% Lambda.hat2 %*% (nrow(X.tilde)*ginv.XX.hat)))
-                
-                
+                    df.correction*(((nrow(X.hat)*ginv.XX.hat) %*% Lambda.hat1 %*% (nrow(X.tilde)*ginv.XX.tilde)) +
+                    ((nrow(X.tilde)*ginv.XX.tilde) %*% Lambda.hat2 %*% (nrow(X.hat)*ginv.XX.hat)))
+
                 ## Lambda.hat1 <- crossprod((X.hat*diag.ee), X.tilde)
                 ## Lambda.hat2 <- crossprod((X.tilde*diag.ee), X.hat)
                 ## Phi.hat <- Psi.hat.wfe + Psi.hat.fe - df.correction * ( (ginv.XX.hat %*% Lambda.hat1 %*% ginv.XX.tilde) + (ginv.XX.tilde %*% Lambda.hat2 %*% ginv.XX.hat))
@@ -1487,7 +1480,7 @@ wfe <- function (formula, data, treat = "treat.name",
                 ## White test: null hypothesis is ``no misspecification''
                 ## -----------------------------------------------------
 
-                white.stat <- as.double(Re( nrow(X.tilde) * (t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)) ))
+                white.stat <- as.double(Re( n.nonzero.units*(t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)) ))
 
                 ## white.stat <- as.double(Re( nrow(X.hat) * (t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)) ))
                 
