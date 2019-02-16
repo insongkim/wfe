@@ -1466,12 +1466,18 @@ wfe <- function (formula, data, treat = "treat.name",
                 
                 diag.ee <- c(u.hat) * c(e.tilde)
                 
-                Lambda.hat1 <-  1/((nrow(X.hat)))* (crossprod((X.hat*diag.ee), X.tilde))  
-                Lambda.hat2 <-  1/((nrow(X.tilde)))* (crossprod((X.tilde*diag.ee), X.hat))  
+                ## Lambda.hat1 <-  1/((nrow(X.hat)))* (crossprod((X.hat*diag.ee), X.tilde))  
+                ## Lambda.hat2 <-  1/((nrow(X.tilde)))* (crossprod((X.tilde*diag.ee), X.hat))  
+                ## Phi.hat <- Psi.hat.wfe + Psi.hat.fe - 
+                ##     df.correction*(((nrow(X.hat)*ginv.XX.hat) %*% Lambda.hat1 %*% (nrow(X.tilde)*ginv.XX.tilde)) +
+                ##     ((nrow(X.tilde)*ginv.XX.tilde) %*% Lambda.hat2 %*% (nrow(X.hat)*ginv.XX.hat)))
+
+                Lambda.hat1 <-  df.correction * (crossprod((X.hat*diag.ee), X.tilde))  
+                Lambda.hat2 <-  df.correction * (crossprod((X.tilde*diag.ee), X.hat))  
                 Phi.hat <- Psi.hat.wfe + Psi.hat.fe - 
                     df.correction*(((nrow(X.hat)*ginv.XX.hat) %*% Lambda.hat1 %*% (nrow(X.tilde)*ginv.XX.tilde)) +
                     ((nrow(X.tilde)*ginv.XX.tilde) %*% Lambda.hat2 %*% (nrow(X.hat)*ginv.XX.hat)))
-
+                
                 
                 ## Lambda.hat1 <- crossprod((X.hat*diag.ee), X.tilde)
                 ## Lambda.hat2 <- crossprod((X.tilde*diag.ee), X.hat)
