@@ -1,8 +1,8 @@
 Package: wfe
 Type: Package
 Title: Weighted Linear Fixed Effects Regression Models for Causal Inference
-Version: 1.8
-Date: 2019-01-09
+Version: 1.9
+Date: 2019-02-13
 Authors@R: c(
   person("In Song", "Kim", email = "insong@mit.edu", role = c("aut", "cre")),
   person("Kosuke", "Imai", email = "imai@Harvard.edu", role = c("aut"))

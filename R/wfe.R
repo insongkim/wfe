@@ -1083,45 +1083,6 @@ wfe <- function (formula, data, treat = "treat.name",
             gc()
 
 #########################################################################
-
-            
-### moving the first column of D1 to D2
-            
-            
-            ## ## index for "zero dummy columns" after deleting zero-weights observations
-            ## u.zero <- try(which(as(apply(Udummy, 2, sum), "sparseVector") == 0), silent=TRUE)
-            ## if ((class(u.zero) == "try-error") & (White == TRUE)) {
-            ##   stop ("Insufficient memory. White = FALSE option is needed")
-            ## }
-            
-            ## rm(Udummy)
-            ## gc()
-            
-            ## ## unit index for which weights sum to zero
-            ## sum.0.u.index <- which(round(apply(W, 2, sum), digits=10) == 0)
-
-            ## ## unit index for which weights do not sum to zero
-            ## sum.no0.u.index <- which(round(apply(W, 2, sum), digits=10) !=0)
-
-            ## ## D1 index: unit index with 1)0-columns after deleting zero weights observation should be excluded, and 2) weights sum to zero
-            ## temp <- 1:J.u
-            ## ## temp2 <- 1:(J.u+J.t-1)
-
-            ## ## D1.index <- which((!temp %in% u.zero) & (!temp %in% sum.0.u.index))
-            ## D1.index <- which((!temp %in% u.zero))
-            
-            
-            ## ## attaching part of D1 to D2 (units weights sum to zero)
-            ## ## unit index that should be moved from D1 to D2
-            
-            ## ## if (length(which(!temp%in%u.zero & temp%in%sum.0.u.index)) > 0) {
-            ## ##   toD2.index <- which(!temp%in%u.zero & temp%in%sum.0.u.index)
-            ## ##   D2.index <- c(toD2.index, (n.Udummy+1):(n.Udummy+n.Tdummy))
-            ## ## } else {
-            ## ##   D2.index <- c((n.Udummy+1):(n.Udummy+n.Tdummy))
-            ## ## }
-            
-            ## D2.index <- c((n.Udummy+1):(n.Udummy+n.Tdummy))
             
             ## create D1, and D2 
             R2 <- Matrix(D)
@@ -1141,12 +1102,6 @@ wfe <- function (formula, data, treat = "treat.name",
             ## e <- environment()
             ## save(file = "temp.RData", list = ls(), env = e, compress = TRUE)
             
-            ## D1.starL[[1]] <- drop0(D.starL[[1]][,D1.index])
-            ## D1.starL[[2]] <- drop0(D.starL[[2]][,D1.index])
-            ## D2.starL[[1]] <- drop0(D.starL[[1]][,D2.index])
-            ## D2.starL[[2]] <- drop0(D.starL[[2]][,D2.index])
-            ## cat("Number of columns for D1", length(D1.index), "\n")
-            ## cat("Number of columns for D2", length(D2.index), "\n")
 
             D1.starL[[1]] <- drop0(D.starL[[1]][,1:n.Udummy])
             D1.starL[[2]] <- drop0(D.starL[[2]][,1:n.Udummy])
@@ -1154,23 +1109,10 @@ wfe <- function (formula, data, treat = "treat.name",
             D2.starL[[2]] <- drop0(D.starL[[2]][,((n.Udummy+1):(n.Udummy+n.Tdummy))])
             ## cat("Number of columns for D1", n.Udummy, "\n")
             ## cat("Number of columns for D2", n.Tdummy, "\n")
-
-
-            
-
-            ## D1.index.full <- 1:ncol(D.starL[[1]]) %in% D1.index
-            ## D2.index.full <- 1:ncol(D.starL[[1]]) %in% D2.index
-            ## D1.starL[[1]] <- drop0(D.starL[[1]][,D1.index.full])
-            ## D1.starL[[2]] <- drop0(D.starL[[2]][,D1.index.full])
-            ## D2.starL[[1]] <- drop0(D.starL[[1]][,D2.index.full])
-            ## D2.starL[[2]] <- drop0(D.starL[[2]][,D2.index.full])
-
             
             rm(D.starL)
             gc()
 #########################################################################
-
-            
             
             ## sum of sqrt(W.it) across years for each dyad
             general.inv <- function(weight, tol = tol){
@@ -1186,7 +1128,7 @@ wfe <- function (formula, data, treat = "treat.name",
             rm(R1, I1)
             gc()
 
-            
+
             inv.weight <- sapply(sum.sqrtW, general.inv, tol)
 
             rm(sum.sqrtW)
@@ -1225,7 +1167,6 @@ wfe <- function (formula, data, treat = "treat.name",
             ##   flush.console()
             ## }
             
-            
             Q <- try(Sparse_compMatrixMultiply(Q1L[[1]], Q1L[[2]], D2.starL[[1]], D2.starL[[2]]), silent = TRUE)
             if ((class(Q) == "try-error") & (White == TRUE)) {
                 stop ("Insufficient memory. White = FALSE option is needed")
@@ -1235,7 +1176,6 @@ wfe <- function (formula, data, treat = "treat.name",
 
             
             Q.matrix <- matrix(complex(real=as.matrix(Q[[1]]), imaginary=as.matrix(Q[[2]])), nrow=nrow(Q[[1]]))
-
 
             QQ.inv <- list()
             QQ.inv[[1]] <- drop0(Matrix(Re(ginv(crossprod(Q.matrix)))))
@@ -1297,7 +1237,6 @@ wfe <- function (formula, data, treat = "treat.name",
                 Y.wdm <- NULL
                 X.wdm <- NULL
             }
-            
 
             rm(Transformed)
             gc()
@@ -1308,7 +1247,6 @@ wfe <- function (formula, data, treat = "treat.name",
                 colnames(X.tilde) <- colnames(X)
             }
 
-            
             ginv.XX.tilde <- ginv(crossprod(X.tilde))
             betaT <- ginv.XX.tilde%*% crossprod(X.tilde, y.tilde)
             if (length(betaT) == 1) {
@@ -1321,15 +1259,6 @@ wfe <- function (formula, data, treat = "treat.name",
 
             ## e <- environment()
             ## save(file = "temp.RData", list = ls(), env = e)
-            
-
-            ## heteroskedasticity robust standard errors
-
-            ## if (verbose) {
-            ##   cat("\nStd.error calculation start\n")
-            ##   Sys.time()
-            ##   flush.console()
-            ## }
             
 
             ## #######################################################################            
@@ -1375,7 +1304,6 @@ wfe <- function (formula, data, treat = "treat.name",
             ## cat("Sum of squared residuals:", sum(resid^2), "\n")
             sigma2 <- as.double(Re(sum(resid^2)/d.f))
             
-            ## cat("sigma2", sigma2, "\n")
 
             ## e <- environment()
             ## save(file = "temp.RData", list = ls(), env = e)
@@ -1392,11 +1320,21 @@ wfe <- function (formula, data, treat = "treat.name",
                 ## data backup
                 data.zero <- data
                 zero.ind <- which(data$W.it==0)
-                if(length(zero.ind)>0){
+                if(length(zero.ind) > 0){
                     data.nonzero <- data[-zero.ind, ]
+                } else {
+                    data.nonzero <- data
                 }
                 n.units <- length(unique(data$u.index))
                 n.times <- length(unique(data$t.index))
+
+                if(unweighted == FALSE){
+                    n.nonzero.units <- length(unique(data.nonzero$u.index))
+                    n.nonzero.times <- length(unique(data.nonzero$t.index))
+                } else {
+                    n.nonzero.units <- n.units
+                    n.nonzero.times <- n.times
+                }
                 
                 ## Demean data
                 ## -----------------------------------------------------
@@ -1463,8 +1401,8 @@ wfe <- function (formula, data, treat = "treat.name",
                 }
 
                 ## asymptotic variance using Methods of Moments
-                inv.U <- solve(1/n.units * U)
-                V <- 1/n.units * V
+                inv.U <- solve(1/n.nonzero.units * U)
+                V <- 1/n.nonzero.units * V
                 Psi.hat.wfe <- inv.U %*% V %*% inv.U
 
                 ## -----------------------------------------------------
@@ -1473,93 +1411,17 @@ wfe <- function (formula, data, treat = "treat.name",
 
                 Omega.hat.fe.HAC <- OmegaHatHAC(nrow(X.hat), ncol(X.hat), data$u.index, J.u, X.hat, u.hat)
                 Omega.hat.fe.HAC <- matrix(Omega.hat.fe.HAC, nrow = ncol(X.hat), ncol = ncol(X.hat))
-                ## Omega.hat.fe.HAC <- (1/(nrow(X.hat)-J.u-J.t-p)) * Omega.hat.fe.HAC
                 Omega.hat.fe.HAC <- (1/J.u) * Omega.hat.fe.HAC
 
-                ## Psi.hat.fe <- (nrow(X.hat)*ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (nrow(X.hat)*ginv.XX.hat)
                 Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (J.u*ginv.XX.hat)
                 ## garbage collection
                 rm(Omega.hat.fe.HAC)
 
-                
-                ## -----------------------------------------------------
-                ## old code 
-                ## -----------------------------------------------------
-                
-                ## ## degrees of freedom adjustment
-                ## ## cat("degrees of freedom:", J.u, J.t, p, "\n")
-                ## df.adjust <- 1/(nrow(X.tilde)) * ((nrow(X.tilde)-1)/(nrow(X.tilde)-J.u-J.t-p+1)) * (J.u/(J.u-1))
-                
-                ## Omega.hat.HAC <- as.double(comp_OmegaHAC(c(X.tilde), e.tilde, c(X.tilde), e.tilde, dim(X.tilde)[1], dim(X.tilde)[2], data$u.index, J.u))
-                ## Omega.hat.HAC <- matrix(Omega.hat.HAC, nrow=ncol(X.tilde), ncol=ncol(X.tilde), byrow=T)
-                ## ## Omega.hat.HAC <- (1/(nrow(X.tilde)-J.u-J.t-p+1))* Omega.hat.HAC
-                ## ## Omega.hat.HAC <- (1/(nrow(X.tilde)))* Omega.hat.HAC 
-                ## ## Omega.hat.HAC <- df.adjust * Omega.hat.HAC
-                ## Omega.hat.HAC <- (1/J.u) * Omega.hat.HAC
-
-
-                ## ## check positive definiteness of Omega.hat.HAC
-                ## if ( sum(as.numeric(eigen(Omega.hat.HAC)$values < 0)) > 0 ) {
-                ##     ## cat ("*** Omega.hat is not positive definite ***\n")                    
-                ##     stop ("*** Omega.hat is not positive definite ***")
-
-                ## }
-                
-                ## Omega.hat.fe.HAC <- OmegaHatHAC(nrow(X.hat), ncol(X.hat), data$u.index, J.u, X.hat, u.hat)
-                ## Omega.hat.fe.HAC <- matrix(Omega.hat.fe.HAC, nrow = ncol(X.hat), ncol = ncol(X.hat))
-                ## ## Omega.hat.fe.HAC <- (1/(nrow(X.hat)-J.u-J.t-p)) * Omega.hat.fe.HAC
-                ## Omega.hat.fe.HAC <- (1/J.u) * Omega.hat.fe.HAC
-                
-                ## ## Psi.hat.wfe <- ((nrow(X.tilde))*ginv.XX.tilde) %*% Omega.hat.HAC %*% ((nrow(X.tilde))*ginv.XX.tilde)
-                ## ## Psi.hat.fe <- (nrow(X.hat)*ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (nrow(X.hat)*ginv.XX.hat)
-                ## ## Psi.hat.wfe <- (J.u*ginv.XX.tilde) %*% Omega.hat.HAC %*% (J.u*ginv.XX.tilde)
-                ## Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (J.u*ginv.XX.hat)
-                
-                ## ## garbage collection
-                ## rm(Omega.hat.HAC, Omega.hat.fe.HAC)
-                ## gc()
 
             } else if ( (hetero.se == TRUE) & (auto.se == FALSE)) {
                 stop("Please set hetero.se == TRUE & auto.se == TRUE when you run two-way FE")
-                
-                ## 2. independence across observations but heteroskedasticity (Eq 11)
-                
-                std.error <- "Heteroscedastic Robust Standard Error"
-
-                Omega.hat.HC <- as.double(comp_OmegaHC(c(X.tilde), e.tilde, c(X.tilde), e.tilde, dim(X.tilde)[1], dim(X.tilde)[2], data$u.index, J.u))
-                Omega.hat.HC <- matrix(Omega.hat.HC, nrow=ncol(X.tilde), ncol=ncol(X.tilde), byrow=T)
-                ## Omega.hat.HC <- (1/(nrow(X.tilde)-J.u-J.t-p+1))* Omega.hat.HC
-                Omega.hat.HC <- (1/J.u)* Omega.hat.HC                
-
-                ## Psi.hat.wfe <- ((nrow(X.tilde))*ginv.XX.tilde) %*% Omega.hat.HC %*% ((nrow(X.tilde))*ginv.XX.tilde)
-                Psi.hat.wfe <- (J.u*ginv.XX.tilde) %*% Omega.hat.HC %*% (J.u*ginv.XX.tilde)
-                
-                ## ## alternatively calculation (don't need to invert)
-                ## Psi.hat.wfe2 <- (length(y.tilde)*ginv.XX.tilde) %*% ( (1/length(y.tilde)) * (crossprod((X.tilde*diag.ee.tilde), X.tilde)) ) %*% ((length(y.tilde))*ginv.XX.tilde)
-
-                
-                ## Omega.hat for FE
-
-                Omega.hat.fe.he <- OmegaHatHC(nrow(X.hat), ncol(X.hat), data$u.index, J.u, X.hat, u.hat)
-                Omega.hat.fe.he <- matrix(Omega.hat.fe.he, nrow = ncol(X.hat), ncol = ncol(X.hat))
-                ## Omega.hat.fe.he <- (1/(nrow(X.hat)-J.u-J.t-p+1)) * Omega.hat.fe.he
-                Omega.hat.fe.he <- (1/J.u) * Omega.hat.fe.he                
-
-                ## Psi.hat.fe <- (nrow(X.hat)*ginv.XX.hat) %*% Omega.hat.fe.he %*% (nrow(X.hat)*ginv.XX.hat)
-                Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Omega.hat.fe.he %*% (J.u*ginv.XX.hat)                
-
-                ## Same as the following matrix multiplication
-                ## Psi.hat.fe <- (solve(XX.hat) %*% (1/d.f *(t(X.hat) %*% diag(diag(u.hat %*% t(u.hat))) %*% X.hat)) %*% solve(XX.hat))
-
-                ## garbage collection
-                rm(Omega.hat.HC, Omega.hat.fe.he)
-                gc()
-                
-
             } else if ( (hetero.se == FALSE) & (auto.se == FALSE) ) {# indepdence and homoskedasticity
-
                 stop("Please set hetero.se == TRUE & auto.se == TRUE when you run two-way FE")
-                
             } else if ( (hetero.se == FALSE) & (auto.se == TRUE) ) {# Kiefer
                 stop ("Robust standard errors with autocorrelation and homoskedasiticy is not supported")
             }
@@ -1568,30 +1430,32 @@ wfe <- function (formula, data, treat = "treat.name",
             ## vcov of wfe model
 
             ## degrees of freedom correction
+            Nstar <- nrow(data)-length(which(data$W.it==0))
+            nK <- dim(X.tilde)[2]
+            df.correction <- (Nstar-nK+1)/(Nstar-n.nonzero.units-n.nonzero.times-nK+1)
+            
             if(df.adjustment == TRUE){
-                Nstar <- nrow(data)-length(which(data$W.it==0))
-                nK <- dim(X.tilde)[2]
-                df.correction <- (Nstar-nK+1)/(Nstar-n.units-n.times-nK+1)
-                Psi.hat.wfe <- (n.units/(n.units-1))* df.correction * Psi.hat.wfe
+                Psi.hat.wfe <- df.correction * Psi.hat.wfe
+                ## for the standard FE
+                df.correction.fe <- (nrow(data)-nK+1)/(nrow(data)-n.units-n.times-nK+1)
+                Psi.hat.fe <- df.correction.fe * Psi.hat.fe
+                
             } else {
                 Psi.hat.wfe <- Psi.hat.wfe
             }
 
-            vcov.wfe <- Psi.hat.wfe * (1/n.units)            
-            ## cat("dimension of vcov:", dim(vcov.wfe), "\n")
+            vcov.wfe <- Psi.hat.wfe * (1/n.nonzero.units)            
             se.did <- as.double(Re(sqrt(diag(vcov.wfe))))
             
             ## vcov of standard fe model (note:already divided by J.u)
-            ## var.cov.fe <- Psi.hat.fe * (1/nrow(X.hat))
             var.cov.fe <- Psi.hat.fe * (1/J.u)
             se.ols <- sqrt(diag(var.cov.fe))
             
             if (verbose) {
-              cat("\nStd.error calculation done")
+              cat("\nStd.error calculation done\n")
               flush.console()
             }
 
-           
             ## e <- environment()
             ## save(file = "temp.RData", list = ls(), env = e)
             
@@ -1602,22 +1466,29 @@ wfe <- function (formula, data, treat = "treat.name",
                 
                 diag.ee <- c(u.hat) * c(e.tilde)
                 
-                Lambda.hat1 <-  1/((nrow(X.hat)))* (crossprod((X.hat*diag.ee), X.tilde))  
-                Lambda.hat2 <-  1/((nrow(X.tilde)))* (crossprod((X.tilde*diag.ee), X.hat))  
+                ## Lambda.hat1 <-  1/((nrow(X.hat)))* (crossprod((X.hat*diag.ee), X.tilde))  
+                ## Lambda.hat2 <-  1/((nrow(X.tilde)))* (crossprod((X.tilde*diag.ee), X.hat))  
+                ## Phi.hat <- Psi.hat.wfe + Psi.hat.fe - df.correction * ( (nrow(X.hat)*ginv.XX.hat) %*% Lambda.hat1 %*% (nrow(X.tilde)*ginv.XX.tilde) + (nrow(X.tilde)*ginv.XX.tilde) %*% Lambda.hat2 %*% (nrow(X.hat)*ginv.XX.hat))
 
-                Phi.hat <- Psi.hat.wfe + Psi.hat.fe - (nrow(X.hat)*ginv.XX.hat) %*% Lambda.hat1 %*% (nrow(X.tilde)*ginv.XX.tilde) - (nrow(X.tilde)*ginv.XX.tilde) %*% Lambda.hat2 %*% (nrow(X.hat)*ginv.XX.hat)
-
+                Lambda.hat1 <- crossprod((X.hat*diag.ee), X.tilde)
+                Lambda.hat2 <- crossprod((X.tilde*diag.ee), X.hat)
+                Phi.hat <- Psi.hat.wfe + Psi.hat.fe - df.correction * ( (ginv.XX.hat %*% Lambda.hat1 %*% ginv.XX.tilde) + (ginv.XX.tilde %*% Lambda.hat2 %*% ginv.XX.hat))
+                
+                ## -----------------------------------------------------
                 ## White test: null hypothesis is ``no misspecification''
+                ## -----------------------------------------------------
 
-                white.stat <- as.double(Re(nrow(X.hat) * t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)))
+                ## white.stat <- as.double(Re(n.nonzero.units * t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)))
+
+                white.stat <- as.double(Re(t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)))
                 test.null <- pchisq(as.numeric(white.stat), df=p, lower.tail=F) < White.alpha
                 white.p <- pchisq(as.numeric(white.stat), df=p, lower.tail=F)
                 flush.console()
 
-                ## if (verbose) {
-                ##   cat("\nWhite calculation done")
-                ##   flush.console()
-                ## }
+                if (verbose) {
+                  cat("\nWhite calculation done\n")
+                  flush.console()
+                }
 
                 
             } else {
