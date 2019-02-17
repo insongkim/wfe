@@ -1472,26 +1472,27 @@ wfe <- function (formula, data, treat = "treat.name",
                 ##     df.correction*(((nrow(X.hat)*ginv.XX.hat) %*% Lambda.hat1 %*% (nrow(X.tilde)*ginv.XX.tilde)) +
                 ##     ((nrow(X.tilde)*ginv.XX.tilde) %*% Lambda.hat2 %*% (nrow(X.hat)*ginv.XX.hat)))
 
-                Lambda.hat1 <-  df.correction * (crossprod((X.hat*diag.ee), X.tilde))  
-                Lambda.hat2 <-  df.correction * (crossprod((X.tilde*diag.ee), X.hat))  
-                Phi.hat <- Psi.hat.wfe + Psi.hat.fe - 
-                    df.correction*(((nrow(X.hat)*ginv.XX.hat) %*% Lambda.hat1 %*% (nrow(X.tilde)*ginv.XX.tilde)) +
-                    ((nrow(X.tilde)*ginv.XX.tilde) %*% Lambda.hat2 %*% (nrow(X.hat)*ginv.XX.hat)))
+                ## Lambda.hat1 <-  df.correction * (crossprod((X.hat*diag.ee), X.tilde))  
+                ## Lambda.hat2 <-  df.correction * (crossprod((X.tilde*diag.ee), X.hat))  
+                ## Phi.hat <- Psi.hat.wfe + Psi.hat.fe - 
+                ##     df.correction*(((nrow(X.hat)*ginv.XX.hat) %*% Lambda.hat1 %*% (nrow(X.tilde)*ginv.XX.tilde)) +
+                ##     ((nrow(X.tilde)*ginv.XX.tilde) %*% Lambda.hat2 %*% (nrow(X.hat)*ginv.XX.hat)))
                 
-                
-                ## Lambda.hat1 <- crossprod((X.hat*diag.ee), X.tilde)
-                ## Lambda.hat2 <- crossprod((X.tilde*diag.ee), X.hat)
-                ## Phi.hat <- Psi.hat.wfe + Psi.hat.fe - df.correction * ( (ginv.XX.hat %*% Lambda.hat1 %*% ginv.XX.tilde) + (ginv.XX.tilde %*% Lambda.hat2 %*% ginv.XX.hat))
+
+                df.white <- (nrow(X.hat)-1)/(nrow(X.tilde)-n.nonzero.units-n.nonzero.times-nK+1)
+
+                Lambda.hat1 <- crossprod((X.hat*diag.ee), X.tilde)
+                Lambda.hat2 <- crossprod((X.tilde*diag.ee), X.hat)
+                Phi.hat <- Psi.hat.wfe + ((nrow(X.hat)-1)/(nrow(X.tilde)-1))*Psi.hat.fe - df.white*( (ginv.XX.hat %*% Lambda.hat1 %*% ginv.XX.tilde) + (ginv.XX.tilde %*% Lambda.hat2 %*% ginv.XX.hat))
                 
                 ## -----------------------------------------------------
                 ## White test: null hypothesis is ``no misspecification''
                 ## -----------------------------------------------------
 
-                white.stat <- as.double(Re( nrow(X.tilde)*(t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)) ))
+                ## white.stat <- as.double(Re( nrow(X.tilde)*(t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)) ))
 
-                ## white.stat <- as.double(Re( nrow(X.hat) * (t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)) ))
+                white.stat <- as.double(Re(t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)))
                 
-                ## white.stat <- as.double(Re(t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)))
                 test.null <- pchisq(as.numeric(white.stat), df=p, lower.tail=F) < White.alpha
                 white.p <- pchisq(as.numeric(white.stat), df=p, lower.tail=F)
                 flush.console()
