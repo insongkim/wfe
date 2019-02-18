@@ -1493,8 +1493,8 @@ wfe <- function (formula, data, treat = "treat.name",
 
                 white.stat <- as.double(Re(t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)))
                 
-                test.null <- pchisq(as.numeric(white.stat), df=p, lower.tail=F) < White.alpha
-                white.p <- pchisq(as.numeric(white.stat), df=p, lower.tail=F)
+                test.null <- pchisq(as.numeric(white.stat), df=nK+1, lower.tail=F) < White.alpha
+                white.p <- pchisq(as.numeric(white.stat), df=nK+1, lower.tail=F)
                 flush.console()
 
                 if (verbose) {
