@@ -1483,7 +1483,7 @@ wfe <- function (formula, data, treat = "treat.name",
 
                 Lambda.hat1 <- crossprod((X.hat*diag.ee), X.tilde)
                 Lambda.hat2 <- crossprod((X.tilde*diag.ee), X.hat)
-                Phi.hat <- Psi.hat.wfe + ((nrow(X.hat)-1)/(nrow(X.tilde)-1))*Psi.hat.fe - df.white*( (ginv.XX.hat %*% Lambda.hat1 %*% ginv.XX.tilde) + (ginv.XX.tilde %*% Lambda.hat2 %*% ginv.XX.hat))
+                Phi.hat <- Psi.hat.wfe + Psi.hat.fe - df.white*( (ginv.XX.hat %*% Lambda.hat1 %*% ginv.XX.tilde) + (ginv.XX.tilde %*% Lambda.hat2 %*% ginv.XX.hat))
                 
                 ## -----------------------------------------------------
                 ## White test: null hypothesis is ``no misspecification''
