@@ -1462,6 +1462,10 @@ wfe <- function (formula, data, treat = "treat.name",
 
 ### White (1980) Test: Theorem 4
 
+            if(unweighted){
+                cov.term <- 0                  
+            }
+            
             if (White == TRUE){
                 
                 diag.ee <- c(u.hat) * c(e.tilde)
@@ -1484,6 +1488,9 @@ wfe <- function (formula, data, treat = "treat.name",
                 Lambda.hat1 <- crossprod((X.hat*diag.ee), X.tilde)
                 Lambda.hat2 <- crossprod((X.tilde*diag.ee), X.hat)
                 Phi.hat <- Psi.hat.wfe + Psi.hat.fe - df.white*( (ginv.XX.hat %*% Lambda.hat1 %*% ginv.XX.tilde) + (ginv.XX.tilde %*% Lambda.hat2 %*% ginv.XX.hat))
+
+
+                cov.term <- df.white*( (ginv.XX.hat %*% Lambda.hat1 %*% ginv.XX.tilde) + (ginv.XX.tilde %*% Lambda.hat2 %*% ginv.XX.hat))
                 
                 ## -----------------------------------------------------
                 ## White test: null hypothesis is ``no misspecification''
@@ -1582,6 +1589,7 @@ wfe <- function (formula, data, treat = "treat.name",
                       White.alpha = White.alpha,
                       White.stat = white.stat,
                       White.test = test.null,
+                      cov.term = cov.term,
                       Y.wdm = Y.wdm,
                       X.wdm = X.wdm)
 
@@ -1632,6 +1640,7 @@ summary.wfe <- function(object, signif.stars = getOption("show.signif.stars"),..
                 White.alpha = object$White.alpha,
                 White.stat = object$White.stat,
                 White.test = object$White.test,
+                cov.term = cov.term,
                 Y = object$y,
                 X = object$x,
                 Y.wdm = object$Y.wdm,
