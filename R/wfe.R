@@ -2,7 +2,7 @@ wfe <- function (formula, data, treat = "treat.name",
                  unit.index, time.index = NULL, method = "unit",
                  dyad1.index = NULL, dyad2.index = NULL,
                  qoi = "ate", estimator = NULL, C.it = NULL,
-                 hetero.se = TRUE, auto.se = TRUE, df.adjustment = TRUE,
+                 hetero.se = TRUE, auto.se = TRUE,
                  dyad.se = FALSE,
                  White = TRUE, White.alpha = 0.05,
                  verbose = TRUE, unbiased.se = FALSE, unweighted = FALSE,
@@ -1335,87 +1335,117 @@ wfe <- function (formula, data, treat = "treat.name",
                     n.nonzero.units <- n.units
                     n.nonzero.times <- n.times
                 }
+
+                x.vars <- colnames(x)
+                x.vars <- x.vars[-grep("Intercept", x.vars)]
+                variables <- c("y", x.vars)
+
+                
+                ## brute force calculation
                 
                 ## Demean data
                 ## -----------------------------------------------------
                 ## 2way demean variables 
                 ## -----------------------------------------------------
 
-                x.vars <- colnames(x)
-                x.vars <- x.vars[-grep("Intercept", x.vars)]
-                variables <- c("y", x.vars)
 
-                DemeanedMatrix <- matrix(NA, nrow=nrow(data), ncol=length(variables))
-                colnames(DemeanedMatrix) <- variables
-                year.counts <- as.numeric(table(data$unit))
-                unit.counts <- as.numeric(table(data$time))
-                obs.counts <- nrow(data)
+                ## DemeanedMatrix <- matrix(NA, nrow=nrow(data), ncol=length(variables))
+                ## colnames(DemeanedMatrix) <- variables
+                ## year.counts <- as.numeric(table(data$unit))
+                ## unit.counts <- as.numeric(table(data$time))
+                ## obs.counts <- nrow(data)
 
                 ## e <- environment()
                 ## save(file = "temp.RData", list = ls(), env = e)
                 
-                for(k in 1:length(variables)){
-                    v <- variables[k]
-                    cmd1 <- paste("demean.unit <- tapply(data$", v, ", as.factor(data$u.index), mean, na.rm=T)", sep="")
-                    cmd2 <- paste("demean.time <- tapply(data$", v, ", as.factor(data$t.index), mean, na.rm=T)", sep="")
-                    cmd3 <- paste("demean.all <- mean(data$", v, ", na.rm=T)", sep="")
-                    cmd4 <- paste("demean.units <- demean.unit[match(data$u.index, names(demean.unit))]", sep="")
-                    cmd5 <- paste("demean.times <- demean.time[match(data$t.index, names(demean.time))]", sep="")
-                    cmd6 <- paste("demean.alls <- rep(demean.all, times=obs.counts)", sep="")
-                    cmd7 <- paste("DemeanedMatrix[,k] <- data$", v, "- demean.units - demean.times + demean.alls", sep="")
+                ## for(k in 1:length(variables)){
+                ##     v <- variables[k]
+                ##     ## cmd1 <- paste("demean.unit <- tapply(data$", v, ", as.factor(data$u.index), mean, na.rm=T)", sep="")
+                ##     ## cmd2 <- paste("demean.time <- tapply(data$", v, ", as.factor(data$t.index), mean, na.rm=T)", sep="")
+                ##     ## cmd3 <- paste("demean.all <- mean(data$", v, ", na.rm=T)", sep="")
 
-                    eval(parse(text=cmd1))
-                    eval(parse(text=cmd2))
-                    eval(parse(text=cmd3))
-                    eval(parse(text=cmd4))
-                    eval(parse(text=cmd5))
-                    eval(parse(text=cmd6))
-                    eval(parse(text=cmd7))
-                }
-                ## verify: should return the same results (checked!)
-                ## lm(y~ as.factor(u.index) + as.factor(t.index) + tr+x1+x2, data=data)
-                ## lm(DemeanedMatrix[,1]~ -1 + DemeanedMatrix[,-1])
-
-                ## standard error calculation
-                unique.units <- unique(data$u.index)
-                U <- matrix(0, nrow=length(x.vars), ncol=length(x.vars))
-                V <- matrix(0, nrow=length(x.vars), ncol=length(x.vars))
-                Beta <- as.matrix(coef.wls)
+                ##     cmd1 <- paste("demean.unit <- sapply(split(data,data$u.index),function(x) weighted.mean(x$", v, ", x$W.it, na.rm=T))", sep="")
+                ##     cmd2 <- paste("demean.time <- sapply(split(data,data$t.index),function(x) weighted.mean(x$", v, ", x$W.it, na.rm=T))", sep="")
+                ##     cmd3 <- paste("demean.all <- weighted.mean(data$", v, ",w=data$W.it, na.rm=T)", sep="")
                 
-                for(g in 1:length(unique.units)){
-                    unit.g <- unique.units[g]
-                    Y.dm <- DemeanedMatrix[which(data$u.index==unit.g),1]
-                    X.dm <- DemeanedMatrix[which(data$u.index==unit.g),-1]
-                    if(length(which(data$u.index==unit.g))==1){
-                        W.diag <- as.matrix(data$W.it[data$u.index==unit.g])
-                        Y.dm <- as.matrix(Y.dm)
-                        X.dm <- t(as.matrix(X.dm))
-                    } else {
-                        W.diag <- diag(data$W.it[data$u.index==unit.g])
-                    }
+                ##     ## cmd1 <- paste("demean.unit <- tapply(data$", v, ", as.factor(data$u.index), weighted.mean, w=na.rm=T)", sep="")
+                ##     ## cmd2 <- paste("demean.time <- tapply(data$", v, ", as.factor(data$t.index), weighted.mean, na.rm=T)", sep="")
+                ##     ## cmd3 <- paste("demean.all <- weighted.mean(data$", v, ", na.rm=T)", sep="")
 
-                    U.i <- t(X.dm) %*% W.diag %*% X.dm
-                    U <- U + U.i
-                    V.i <- t(X.dm) %*% W.diag %*% (Y.dm-X.dm %*% Beta) %*% t(Y.dm-X.dm %*% Beta) %*% W.diag %*% X.dm
-                    V <- V + V.i
-                }
+                ##     cmd4 <- paste("demean.units <- demean.unit[match(data$u.index, names(demean.unit))]", sep="")
+                ##     cmd5 <- paste("demean.times <- demean.time[match(data$t.index, names(demean.time))]", sep="")
+                ##     cmd6 <- paste("demean.alls <- rep(demean.all, times=obs.counts)", sep="")
+                ##     cmd7 <- paste("DemeanedMatrix[,k] <- data$", v, "- demean.units - demean.times + demean.alls", sep="")
 
-                ## asymptotic variance using Methods of Moments
-                inv.U <- solve(1/n.nonzero.units * U)
-                V <- 1/n.nonzero.units * V
-                Psi.hat.wfe <- inv.U %*% V %*% inv.U
+                ##     eval(parse(text=cmd1))
+                ##     eval(parse(text=cmd2))
+                ##     eval(parse(text=cmd3))
+                ##     eval(parse(text=cmd4))
+                ##     eval(parse(text=cmd5))
+                ##     eval(parse(text=cmd6))
+                ##     eval(parse(text=cmd7))
+                ## }
+                ## ## verify: should return the same results (checked!)
+                ## ## lm(y~ as.factor(u.index) + as.factor(t.index) + tr+x1+x2, data=data)
+                ## ## lm(DemeanedMatrix[,1]~ -1 + DemeanedMatrix[,-1])
 
+                ## ## standard error calculation
+                ## unique.units <- unique(data$u.index)
+                ## U <- matrix(0, nrow=length(x.vars), ncol=length(x.vars))
+                ## V <- matrix(0, nrow=length(x.vars), ncol=length(x.vars))
+                ## Beta <- as.matrix(coef.wls)
+                
+                ## for(g in 1:length(unique.units)){
+                ##     unit.g <- unique.units[g]
+                ##     Y.dm <- DemeanedMatrix[which(data$u.index==unit.g),1]
+                ##     X.dm <- DemeanedMatrix[which(data$u.index==unit.g),-1]
+                ##     if(length(which(data$u.index==unit.g))==1){
+                ##         W.diag <- as.matrix(data$W.it[data$u.index==unit.g])
+                ##         Y.dm <- as.matrix(Y.dm)
+                ##         X.dm <- t(as.matrix(X.dm))
+                ##     } else {
+                ##         W.diag <- diag(data$W.it[data$u.index==unit.g])
+                ##     }
+
+                ##     U.i <- t(X.dm) %*% W.diag %*% X.dm
+                ##     U <- U + U.i
+                ##     V.i <- t(X.dm) %*% W.diag %*% (Y.dm-X.dm %*% Beta) %*% t(Y.dm-X.dm %*% Beta) %*% W.diag %*% X.dm
+                ##     V <- V + V.i
+                ## }
+
+                ## ## asymptotic variance using Methods of Moments
+                ## inv.U <- solve(U)
+                ## Psi.hat.wfe <- inv.U %*% V %*% inv.U
+
+
+                ## equation 14 in FEmatch-Twoway
+                Omega.hat.HAC <- as.double(comp_OmegaHAC(c(X.tilde), e.tilde, c(X.tilde), e.tilde,
+                                                         dim(X.tilde)[1], dim(X.tilde)[2], data$u.index, J.u))
+                Omega.hat.HAC <- matrix(Omega.hat.HAC, nrow=ncol(X.tilde), ncol=ncol(X.tilde), byrow=T)
+                
+                df_wfe2 <- (nrow(X.tilde)/(nrow(X.tilde)-1))*((nrow(X.tilde)-length(x.vars))/(nrow(X.tilde)- n.nonzero.units - n.nonzero.times - length(x.vars)))
+                Psi.hat.wfe <- df_wfe2*((ginv.XX.tilde %*% Omega.hat.HAC %*% ginv.XX.tilde))
+                
                 ## -----------------------------------------------------
                 ## vcov matrix for FE for White statistics calculation
                 ## -----------------------------------------------------
 
-                Omega.hat.fe.HAC <- OmegaHatHAC(nrow(X.hat), ncol(X.hat), data$u.index, J.u, X.hat, u.hat)
-                Omega.hat.fe.HAC <- matrix(Omega.hat.fe.HAC, nrow = ncol(X.hat), ncol = ncol(X.hat))
-                Omega.hat.fe.HAC <- (1/J.u) * Omega.hat.fe.HAC
-
-                Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (J.u*ginv.XX.hat)
-                ## garbage collection
-                rm(Omega.hat.fe.HAC)
+                if (White == TRUE){
+                    Omega.hat.fe.HAC <- OmegaHatHAC(nrow(X.hat), ncol(X.hat), data$u.index, J.u, X.hat, u.hat)
+                    Omega.hat.fe.HAC <- matrix(Omega.hat.fe.HAC, nrow = ncol(X.hat), ncol = ncol(X.hat))
+                    Omega.hat.fe.HAC <- (1/J.u) * Omega.hat.fe.HAC
+                    
+                    Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (J.u*ginv.XX.hat)
+                    ## garbage collection
+                    rm(Omega.hat.fe.HAC)
+                    
+                    nK <- dim(X.hat)[2]
+                    df.correction.fe <- (nrow(data)-nK+1)/(nrow(data)-n.units-n.times-nK+1)
+                    Psi.hat.fe <- df.correction.fe * Psi.hat.fe
+                    ## vcov of standard fe model (note:already divided by J.u)
+                    var.cov.fe <- Psi.hat.fe * (1/J.u)
+                    se.ols <- sqrt(diag(var.cov.fe))
+                }
 
 
             } else if ( (hetero.se == TRUE) & (auto.se == FALSE)) {
@@ -1427,29 +1457,9 @@ wfe <- function (formula, data, treat = "treat.name",
             }
 
 
-            ## vcov of wfe model
-
-            ## degrees of freedom correction
-            Nstar <- nrow(data)-length(which(data$W.it==0))
-            nK <- dim(X.tilde)[2]
-            df.correction <- (Nstar-nK+1)/(Nstar-n.nonzero.units-n.nonzero.times-nK+1)
-            
-            if(df.adjustment == TRUE){
-                Psi.hat.wfe <- df.correction * Psi.hat.wfe
-                ## for the standard FE
-                df.correction.fe <- (nrow(data)-nK+1)/(nrow(data)-n.units-n.times-nK+1)
-                Psi.hat.fe <- df.correction.fe * Psi.hat.fe
-                
-            } else {
-                Psi.hat.wfe <- Psi.hat.wfe
-            }
-
-            vcov.wfe <- Psi.hat.wfe * (1/n.nonzero.units)            
+            vcov.wfe <- Psi.hat.wfe 
             se.did <- as.double(Re(sqrt(diag(vcov.wfe))))
             
-            ## vcov of standard fe model (note:already divided by J.u)
-            var.cov.fe <- Psi.hat.fe * (1/J.u)
-            se.ols <- sqrt(diag(var.cov.fe))
             
             if (verbose) {
               cat("\nStd.error calculation done\n")
@@ -1463,7 +1473,9 @@ wfe <- function (formula, data, treat = "treat.name",
 ### White (1980) Test: Theorem 4
 
             if(unweighted){
-                cov.term <- 0                  
+                cov.term <- 0
+                cov.term1 <- 0
+                cov.term2 <- 0
             }
             
             if (White == TRUE){
@@ -1483,14 +1495,24 @@ wfe <- function (formula, data, treat = "treat.name",
                 ##     ((nrow(X.tilde)*ginv.XX.tilde) %*% Lambda.hat2 %*% (nrow(X.hat)*ginv.XX.hat)))
                 
 
+                nK <- dim(X.hat)[2]
                 df.white <- (nrow(X.hat)-1)/(nrow(X.tilde)-n.nonzero.units-n.nonzero.times-nK+1)
 
-                Lambda.hat1 <- crossprod((X.hat*diag.ee), X.tilde)
-                Lambda.hat2 <- crossprod((X.tilde*diag.ee), X.hat)
-                Phi.hat <- Psi.hat.wfe + Psi.hat.fe - df.white*( (ginv.XX.hat %*% Lambda.hat1 %*% ginv.XX.tilde) + (ginv.XX.tilde %*% Lambda.hat2 %*% ginv.XX.hat))
+                meat1 <- as.double(comp_OmegaHAC(c(X.tilde), e.tilde, c(X.hat), u.hat,
+                                                 dim(X.tilde)[1], dim(X.hat)[2], data$u.index, J.u))
+                Meat1 <- matrix(meat1, nrow=ncol(X.tilde), ncol=ncol(X.tilde), byrow=T)
 
+                meat2 <- as.double(comp_OmegaHAC(c(X.hat), u.hat, c(X.tilde), e.tilde,
+                                                 dim(X.hat)[1], dim(X.tilde)[2], data$u.index, J.u))
+                Meat2 <- matrix(meat2, nrow=ncol(X.tilde), ncol=ncol(X.tilde), byrow=T)
+                
+                df_wfe2 <- (nrow(X.tilde)-nK)/(nrow(X.tilde)- n.nonzero.units - n.nonzero.times - nK)
+                
+                Phi.hat <- Psi.hat.wfe + Psi.hat.fe - df.white*( (ginv.XX.hat %*% Meat1 %*% ginv.XX.tilde) + (ginv.XX.tilde %*% Meat2 %*% ginv.XX.hat))
 
-                cov.term <- df.white*( (ginv.XX.hat %*% Lambda.hat1 %*% ginv.XX.tilde) + (ginv.XX.tilde %*% Lambda.hat2 %*% ginv.XX.hat))
+                cov.term <- df.white*( (ginv.XX.tilde %*% Meat1 %*% ginv.XX.hat) + (ginv.XX.hat %*% Meat2 %*% ginv.XX.tilde) )
+                cov.term1 <- df.white*( (ginv.XX.tilde %*% Meat1 %*% ginv.XX.hat))
+                cov.term2 <- df.white*( (ginv.XX.hat %*% Meat2 %*% ginv.XX.tilde))
                 
                 ## -----------------------------------------------------
                 ## White test: null hypothesis is ``no misspecification''
@@ -1516,7 +1538,6 @@ wfe <- function (formula, data, treat = "treat.name",
                 white.p <- "NULL"
             }
             
-
 
             ## Creating a weight verctor
             ## original index
@@ -1590,6 +1611,8 @@ wfe <- function (formula, data, treat = "treat.name",
                       White.stat = white.stat,
                       White.test = test.null,
                       cov.term = cov.term,
+                      cov.term1 = cov.term1,
+                      cov.term2 = cov.term2,
                       Y.wdm = Y.wdm,
                       X.wdm = X.wdm)
 
@@ -1641,6 +1664,8 @@ summary.wfe <- function(object, signif.stars = getOption("show.signif.stars"),..
                 White.stat = object$White.stat,
                 White.test = object$White.test,
                 cov.term = cov.term,
+                cov.term1 = cov.term1,
+                cov.term2 = cov.term2,
                 Y = object$y,
                 X = object$x,
                 Y.wdm = object$Y.wdm,
