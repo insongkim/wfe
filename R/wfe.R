@@ -1343,10 +1343,10 @@ wfe <- function (formula, data, treat = "treat.name",
                 
                 ## brute force calculation
                 
-                Demean data
-                -----------------------------------------------------
-                2way demean variables 
-                -----------------------------------------------------
+                ## Demean data
+                ## -----------------------------------------------------
+                ## 2way demean variables 
+                ## -----------------------------------------------------
 
 
                 DemeanedMatrix <- matrix(NA, nrow=nrow(data), ncol=length(variables))
