@@ -1360,18 +1360,14 @@ wfe <- function (formula, data, treat = "treat.name",
                 
                 for(k in 1:length(variables)){
                     v <- variables[k]
-                    ## cmd1 <- paste("demean.unit <- tapply(data$", v, ", as.factor(data$u.index), mean, na.rm=T)", sep="")
-                    ## cmd2 <- paste("demean.time <- tapply(data$", v, ", as.factor(data$t.index), mean, na.rm=T)", sep="")
-                    ## cmd3 <- paste("demean.all <- mean(data$", v, ", na.rm=T)", sep="")
+                    cmd1 <- paste("demean.unit <- tapply(data$", v, ", as.factor(data$u.index), mean, na.rm=T)", sep="")
+                    cmd2 <- paste("demean.time <- tapply(data$", v, ", as.factor(data$t.index), mean, na.rm=T)", sep="")
+                    cmd3 <- paste("demean.all <- mean(data$", v, ", na.rm=T)", sep="")
 
-                    cmd1 <- paste("demean.unit <- sapply(split(data,data$u.index),function(x) weighted.mean(x$", v, ", x$W.it, na.rm=T))", sep="")
-                    cmd2 <- paste("demean.time <- sapply(split(data,data$t.index),function(x) weighted.mean(x$", v, ", x$W.it, na.rm=T))", sep="")
-                    cmd3 <- paste("demean.all <- weighted.mean(data$", v, ",w=data$W.it, na.rm=T)", sep="")
+                    ## cmd1 <- paste("demean.unit <- sapply(split(data,data$u.index),function(x) weighted.mean(x$", v, ", x$W.it, na.rm=T))", sep="")
+                    ## cmd2 <- paste("demean.time <- sapply(split(data,data$t.index),function(x) weighted.mean(x$", v, ", x$W.it, na.rm=T))", sep="")
+                    ## cmd3 <- paste("demean.all <- weighted.mean(data$", v, ",w=data$W.it, na.rm=T)", sep="")
                 
-                    ## cmd1 <- paste("demean.unit <- tapply(data$", v, ", as.factor(data$u.index), weighted.mean, w=na.rm=T)", sep="")
-                    ## cmd2 <- paste("demean.time <- tapply(data$", v, ", as.factor(data$t.index), weighted.mean, na.rm=T)", sep="")
-                    ## cmd3 <- paste("demean.all <- weighted.mean(data$", v, ", na.rm=T)", sep="")
-
                     cmd4 <- paste("demean.units <- demean.unit[match(data$u.index, names(demean.unit))]", sep="")
                     cmd5 <- paste("demean.times <- demean.time[match(data$t.index, names(demean.time))]", sep="")
                     cmd6 <- paste("demean.alls <- rep(demean.all, times=obs.counts)", sep="")
