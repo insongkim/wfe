@@ -1448,9 +1448,9 @@ wfe <- function (formula, data, treat = "treat.name",
                 Omega.hat.HAC <- matrix(Omega.hat.HAC, nrow=ncol(X.tilde), ncol=ncol(X.tilde), byrow=T)
                 
                 df_wfe2 <- (nrow(X.tilde)/(nrow(X.tilde)-1))*((nrow(X.tilde)-length(x.vars))/(nrow(X.tilde)- n.nonzero.units - n.nonzero.times - length(x.vars)))
-                Psi.hat.wfe2 <- df_wfe2*((ginv.XX.tilde %*% Omega.hat.HAC %*% ginv.XX.tilde))
+                Psi.hat.wfe <- df_wfe2*((ginv.XX.tilde %*% Omega.hat.HAC %*% ginv.XX.tilde))
 
-                print(Psi.hat.wfe2)
+                print(Psi.hat.wfe)
 
                 ## -----------------------------------------------------
                 ## vcov matrix for FE for White statistics calculation
