@@ -889,11 +889,6 @@ wfe <- function (formula, data, treat = "treat.name",
             ##   cat("\n Standard FE Projection done \n")
             ## flush.console()
             
-            ## e <- environment()
-            ## save(file = "temp2.RData", list = ls(), env = e)
-            
-            
-            
             a <- unlist(strsplit(as.character(formula), "~"))
             formula.ni <- as.formula(paste(a[2], "~ -1 + ",  a[3]))
 
@@ -909,8 +904,6 @@ wfe <- function (formula, data, treat = "treat.name",
             rm(Data.2wdm)
             gc()
             
-
-
             
 ############################################################
 
@@ -928,8 +921,6 @@ wfe <- function (formula, data, treat = "treat.name",
             if (verbose)
                 cat("\nTotal number of observations with non-zero weight:", nz.obs,"\n")
             flush.console()
-            
-
             
             X <- as.matrix(X)[nz.index,]
             Y <- as.matrix(data$y)[nz.index]
@@ -1261,14 +1252,10 @@ wfe <- function (formula, data, treat = "treat.name",
             ## save(file = "temp.RData", list = ls(), env = e)
             
 
-            ## #######################################################################            
-            ## (Robust) standard errors (GMM asymptotic variance for wfe)
-            ## calculating GMM standard errors
-            ## #######################################################################
 
             ## weighted residuals
             e.tilde <- (y.tilde - X.tilde %*% betaT)
-
+            colnames(e.tilde) <- "e.tilde"
             ## true residuals
             resid <- try(1/w.sqrt * (y.tilde - X.tilde %*% betaT))
 
@@ -1304,179 +1291,112 @@ wfe <- function (formula, data, treat = "treat.name",
             ## cat("Sum of squared residuals:", sum(resid^2), "\n")
             sigma2 <- as.double(Re(sum(resid^2)/d.f))
             
+            ## Remove observations with zero weights
+            ## data backup
+            data.zero <- data
+            zero.ind <- which(data$W.it==0)
+            if(length(zero.ind) > 0){
+                data.nonzero <- data[-zero.ind, ]
+            } else {
+                data.nonzero <- data
+            }
+            n.units <- length(unique(data$u.index))
+            n.times <- length(unique(data$t.index))
 
-            ## e <- environment()
-            ## save(file = "temp.RData", list = ls(), env = e)
+            if(unweighted == FALSE){
+                n.nonzero.units <- length(unique(data.nonzero$u.index))
+                n.nonzero.times <- length(unique(data.nonzero$t.index))
+            } else {
+                n.nonzero.units <- n.units
+                n.nonzero.times <- n.times
+            }
 
-            ## two-way WFE robust standard errors calculation
+            x.vars <- colnames(x)
+            x.vars <- x.vars[-grep("Intercept", x.vars)]
+            nK <- length(x.vars) 
+            variables <- c("y", x.vars)
 
-
+            e <- environment()
+            save(file = "temp.RData", list = ls(), env = e)
             
+
+            ## #######################################################################            
+            ## (Robust) standard errors (GMM asymptotic variance for wfe)
+            ## calculating GMM standard errors
+            ## #######################################################################
+
             if ((hetero.se == TRUE) & (auto.se == TRUE)){
 
                 ## 1. arbitrary autocorrelation as well as heteroskedasticity (Eq 12)
                 std.error <- "Heteroscedastic / Autocorrelation Robust Standard Error"
                 ## stop ("Robust standard errors with autocorrelation is currently not supported")
 
-                ## Remove observations with zero weights
-                ## data backup
-                data.zero <- data
-                zero.ind <- which(data$W.it==0)
-                if(length(zero.ind) > 0){
-                    data.nonzero <- data[-zero.ind, ]
-                } else {
-                    data.nonzero <- data
-                }
-                n.units <- length(unique(data$u.index))
-                n.times <- length(unique(data$t.index))
-
-                if(unweighted == FALSE){
-                    n.nonzero.units <- length(unique(data.nonzero$u.index))
-                    n.nonzero.times <- length(unique(data.nonzero$t.index))
-                } else {
-                    n.nonzero.units <- n.units
-                    n.nonzero.times <- n.times
+                ## MeatHAC takes unit level data with T_i rows and
+                ## compute t(X_i) %*% e_i %*% t(e_i) %*% X_i
+                MeatHAC <- function(x){
+                    Xtilde <- as.matrix(x[, -c(1,2)]) # removing u.index, e.tilde
+                    etilde <- x[,2]
+                    Meat <- t(Xtilde) %*% etilde %*% t(etilde) %*% Xtilde
+                    Meat <- matrix(Meat, ncol=ncol(Xtilde), nrow=ncol(Xtilde))
+                    return(Meat)
                 }
 
-                x.vars <- colnames(x)
-                x.vars <- x.vars[-grep("Intercept", x.vars)]
-                variables <- c("y", x.vars)
-
-                e <- environment()
-                save(file = "temp.RData", list = ls(), env = e)
-                
-                ## brute force calculation
-                
-                ## Demean data
-                ## -----------------------------------------------------
-                ## 2way demean variables 
-                ## -----------------------------------------------------
-
-
-                ## DemeanedMatrix <- matrix(NA, nrow=nrow(data), ncol=length(variables))
-                ## colnames(DemeanedMatrix) <- variables
-                ## year.counts <- as.numeric(table(data$unit))
-                ## unit.counts <- as.numeric(table(data$time))
-                ## obs.counts <- nrow(data)
-
-                
-                ## for(k in 1:length(variables)){
-                ##     v <- variables[k]
-                ##     cmd1 <- paste("demean.unit <- tapply(data$", v, ", as.factor(data$u.index), mean, na.rm=T)", sep="")
-                ##     cmd2 <- paste("demean.time <- tapply(data$", v, ", as.factor(data$t.index), mean, na.rm=T)", sep="")
-                ##     cmd3 <- paste("demean.all <- mean(data$", v, ", na.rm=T)", sep="")
-
-                ##     ## cmd1 <- paste("demean.unit <- sapply(split(data,data$u.index),function(x) weighted.mean(x$", v, ", x$W.it, na.rm=T))", sep="")
-                ##     ## cmd2 <- paste("demean.time <- sapply(split(data,data$t.index),function(x) weighted.mean(x$", v, ", x$W.it, na.rm=T))", sep="")
-                ##     ## cmd3 <- paste("demean.all <- weighted.mean(data$", v, ",w=data$W.it, na.rm=T)", sep="")
-                
-                ##     cmd4 <- paste("demean.units <- demean.unit[match(data$u.index, names(demean.unit))]", sep="")
-                ##     cmd5 <- paste("demean.times <- demean.time[match(data$t.index, names(demean.time))]", sep="")
-                ##     cmd6 <- paste("demean.alls <- rep(demean.all, times=obs.counts)", sep="")
-                ##     cmd7 <- paste("DemeanedMatrix[,k] <- data$", v, "- demean.units - demean.times + demean.alls", sep="")
-
-                ##     eval(parse(text=cmd1))
-                ##     eval(parse(text=cmd2))
-                ##     eval(parse(text=cmd3))
-                ##     eval(parse(text=cmd4))
-                ##     eval(parse(text=cmd5))
-                ##     eval(parse(text=cmd6))
-                ##     eval(parse(text=cmd7))
-                ## }
-                ## ## verify: should return the same results (checked!)
-                ## ## lm(y~ as.factor(u.index) + as.factor(t.index) + tr+x1+x2, data=data)
-                ## ## lm(DemeanedMatrix[,1]~ -1 + DemeanedMatrix[,-1])
-
-                ## ## standard error calculation
-                ## unique.units <- unique(data$u.index)
-                ## U <- matrix(0, nrow=length(x.vars), ncol=length(x.vars))
-                ## V <- matrix(0, nrow=length(x.vars), ncol=length(x.vars))
-                ## Beta <- as.matrix(coef.wls)
-                
-                ## for(g in 1:length(unique.units)){
-                ##     unit.g <- unique.units[g]
-                ##     Y.dm <- DemeanedMatrix[which(data$u.index==unit.g),1]
-                ##     X.dm <- DemeanedMatrix[which(data$u.index==unit.g),-1]
-                ##     if(length(which(data$u.index==unit.g))==1){
-                ##         W.diag <- as.matrix(data$W.it[data$u.index==unit.g])
-                ##         Y.dm <- as.matrix(Y.dm)
-                ##         X.dm <- t(as.matrix(X.dm))
-                ##     } else {
-                ##         W.diag <- diag(data$W.it[data$u.index==unit.g])
-                ##     }
-
-                ##     U.i <- t(X.dm) %*% W.diag %*% X.dm
-                ##     U <- U + U.i
-                ##     V.i <- t(X.dm) %*% W.diag %*% (Y.dm-X.dm %*% Beta) %*% t(Y.dm-X.dm %*% Beta) %*% W.diag %*% X.dm
-                ##     V <- V + V.i
-                ## }
-
-                ## ## asymptotic variance using Methods of Moments
-                ## inv.U <- solve(U)
-                ## Psi.hat.wfe <- inv.U %*% V %*% inv.U
-                ## df_wfe2 <- (nrow(X.tilde)/(nrow(X.tilde)-1))*((nrow(X.tilde)-length(x.vars))/(nrow(X.tilde)- n.nonzero.units - n.nonzero.times - length(x.vars)))
-                ## Psi.hat.wfe <- df_wfe2* Psi.hat.wfe
-
-
-                ## compute crossproducts with imaginary numbers
-
-                resid2 <- (Y - X.tilde %*% betaT)
-
+                ## prepare data for vcov calculation & remove units with zero weights
+                D.tilde <- data.frame(u.index = data[,c("u.index")], e.tilde, X.tilde)
+                colnames(D.tilde)[1] <- c("u.index")
                 if(length(zero.ind)>0){
-                    X.wfe <- X.tilde[-zero.ind,]
-                    e.wfe <- resid[-zero.ind]
+                    D.tilde <- D.tilde[-zero.ind,]
                 } else {
-                    X.wfe <- X.tilde
-                    e.wfe <- resid
+                    D.tilde <- D.tilde
                 }
 
+                ## -----------------------------------------------------
+                ## vcov matrix for WFE 
+                ## -----------------------------------------------------
 
-                XeeX.wfe <- as.numeric(Re(crossprod(e.tilde))) * t(X.wfe)  %*% (X.wfe)
-                
-                ## Xe.wfe <- Sparse_compMatrix_crossprod(Re(X.wfe), Im(X.wfe), Re(e.wfe), Im(e.wfe))
-                ## XeeX.wfe <- Sparse_compMatrix_tcrossprod(Xe.wfe[[1]], Xe.wfe[[2]], Xe.wfe[[1]], Xe.wfe[[2]])
-                ## Xee.wfe <- Sparse_compMatrix_tcrossprod(Xe.wfe[[1]], Xe.wfe[[2]], Re(e.wfe), Im(e.wfe))
-                ## XeeX.wfe <- Sparse_compMatrixMultiply(Xee.wfe[[1]], Xee.wfe[[2]], Re(X.wfe), Im(X.wfe))[[1]]
-                XeeX.wfe <- matrix(XeeX.wfe, nrow=ncol(X.tilde), ncol=ncol(X.tilde), byrow=F)
-                ## XeeX.wfe <- crossprod(X.wfe, e.wfe) %*% crossprod(e.wfe, X.wfe)
-                df_wfe2 <- (nrow(X.tilde)/(nrow(X.tilde)-1))*((nrow(X.tilde)-length(x.vars))/(nrow(X.tilde)- n.nonzero.units - n.nonzero.times - length(x.vars)))
-                Psi.hat.wfe <- df_wfe2*((ginv.XX.tilde %*% XeeX.wfe %*% ginv.XX.tilde))
+                ## meat part
+                XeeX <- lapply(split(D.tilde,D.tilde$u.index), MeatHAC)
+                XeeX.wfe <- matrix(0, nrow=nK, ncol=nK)
+                ## add unit level vcov
+                for(g in 1:n.nonzero.units){
+                    XeeX.wfe <- XeeX.wfe + XeeX[[g]]
+                }
+
+                ## degrees of freedom adjustment
+                df_wfe2 <- (nrow(X.tilde)/(nrow(X.tilde)-1))*((nrow(X.tilde)-nK)/(nrow(X.tilde)- n.nonzero.units - n.nonzero.times - nK))
+
+                ## sandwich estimator
+                Psi.hat.wfe <- df_wfe2 * (ginv.XX.tilde %*% XeeX.wfe %*% ginv.XX.tilde)
                 print(Psi.hat.wfe)
 
                 
-                ## if (verbose) {
-                ##     cat("\ntest\n")
-                ##     flush.console()
-                ## }
-                
-                ## Omega.hat.HAC <- as.double(comp_OmegaHAC(c(X.tilde), e.tilde, c(X.tilde), e.tilde,
-                ##                                          dim(X.tilde)[1], dim(X.tilde)[2], data$u.index, J.u))
-                ## Omega.hat.HAC <- matrix(Omega.hat.HAC, nrow=ncol(X.tilde), ncol=ncol(X.tilde), byrow=T)
-                
-                ## df_wfe2 <- (nrow(X.tilde)/(nrow(X.tilde)-1))*((nrow(X.tilde)-length(x.vars))/(nrow(X.tilde)- n.nonzero.units - n.nonzero.times - length(x.vars)))
-                ## Psi.hat.wfe2 <- df_wfe2*((ginv.XX.tilde %*% Omega.hat.HAC %*% ginv.XX.tilde))
-
-                ## print(Psi.hat.wfe2)
-
                 ## -----------------------------------------------------
                 ## vcov matrix for FE for White statistics calculation
                 ## -----------------------------------------------------
 
                 if (White == TRUE){
-                    Omega.hat.fe.HAC <- OmegaHatHAC(nrow(X.hat), ncol(X.hat), data$u.index, J.u, X.hat, u.hat)
-                    Omega.hat.fe.HAC <- matrix(Omega.hat.fe.HAC, nrow = ncol(X.hat), ncol = ncol(X.hat))
-                    Omega.hat.fe.HAC <- (1/J.u) * Omega.hat.fe.HAC
-                    
-                    Psi.hat.fe <- (J.u*ginv.XX.hat) %*% Omega.hat.fe.HAC %*% (J.u*ginv.XX.hat)
-                    ## garbage collection
-                    rm(Omega.hat.fe.HAC)
-                    
-                    nK <- dim(X.hat)[2]
-                    df.correction.fe <- (nrow(data)-nK)/(nrow(data)-n.units-n.times-nK)
-                    Psi.hat.fe <- df.correction.fe * Psi.hat.fe
-                    ## vcov of standard fe model (note:already divided by J.u)
-                    var.cov.fe <- Psi.hat.fe * (1/J.u)
+
+                    ## prepare data for vcov calculation
+                    D.hat <- data.frame(u.index = data[,c("u.index")], u.hat, X.hat)
+                    colnames(D.hat)[1] <- c("u.index")
+
+                    ## SE calcluation
+                    XeeX <- lapply(split(D.hat,D.hat$u.index), MeatHAC)
+                    XeeX.fe <- matrix(0, nrow=nK, ncol=nK)
+                    ## add unit level vcov
+                    for(g in 1:n.units){
+                        XeeX.fe <- XeeX.fe + XeeX[[g]]
+                    }
+
+                    ## degrees of freedom adjustment                    
+                    df_fe2 <- (nrow(X.hat)/(nrow(X.hat)-1))*((nrow(X.hat)-nK)/(nrow(X.hat)-n.units-n.times-nK))
+                    Psi.hat.fe <- df_fe2 * (ginv.XX.hat %*% XeeX.fe %*% ginv.XX.hat)
+
+                    ## storing standard errors                    
+                    var.cov.fe <- Psi.hat.fe
                     se.ols <- sqrt(diag(var.cov.fe))
+                    ## print(Psi.hat.fe)
+                    
                 }
 
 
@@ -1487,20 +1407,15 @@ wfe <- function (formula, data, treat = "treat.name",
             } else if ( (hetero.se == FALSE) & (auto.se == TRUE) ) {# Kiefer
                 stop ("Robust standard errors with autocorrelation and homoskedasiticy is not supported")
             }
-
-
+            
+            ## storing standard errors
             vcov.wfe <- Psi.hat.wfe 
             se.did <- as.double(Re(sqrt(diag(vcov.wfe))))
-            
             
             if (verbose) {
               cat("\nStd.error calculation done\n")
               flush.console()
             }
-
-            e <- environment()
-            save(file = "temp.RData", list = ls(), env = e)
-            
 
 ### White (1980) Test: Theorem 4
 
@@ -1511,36 +1426,46 @@ wfe <- function (formula, data, treat = "treat.name",
             }
             
             if (White == TRUE){
+
+                ## MeatHAC_White takes unit level data with T_i rows and
+                ## compute t(X_i) %*% e1_i %*% t(e2_i) %*% X_i
+                MeatHAC_White <- function(x,y){
+                    X1 <- as.matrix(x[, -c(1,2)]) # removing u.index, e.tilde
+                    X2 <- as.matrix(y[, -c(1,2)]) # removing u.index, e.tilde, e.hat
+                    e1 <- x[,2]
+                    e2 <- y[,2]
+                    Meat <- t(X1) %*% e1 %*% t(e2) %*% X2
+                    Meat <- matrix(Meat, ncol=ncol(X1), nrow=ncol(X1))
+                    ## print(Meat)
+                    return(Meat)
+                }
                 
-                diag.ee <- c(u.hat) * c(e.tilde)
+                ## -----------------------------------------------------
+                ## cov term esitmate for beta_fe2 - beta_wfe2
+                ## -----------------------------------------------------
+
+                ## meat part
+                XeeX1 <- mapply(MeatHAC_White, split(D.tilde,D.tilde$u.index), split(D.hat,D.hat$u.index))
+                XeeX2 <- mapply(MeatHAC_White, split(D.hat,D.hat$u.index), split(D.tilde,D.tilde$u.index))
                 
-                ## Lambda.hat1 <-  1/((nrow(X.hat)))* (crossprod((X.hat*diag.ee), X.tilde))  
-                ## Lambda.hat2 <-  1/((nrow(X.tilde)))* (crossprod((X.tilde*diag.ee), X.hat))  
-                ## Phi.hat <- Psi.hat.wfe + Psi.hat.fe - 
-                ##     df.correction*(((nrow(X.hat)*ginv.XX.hat) %*% Lambda.hat1 %*% (nrow(X.tilde)*ginv.XX.tilde)) +
-                ##     ((nrow(X.tilde)*ginv.XX.tilde) %*% Lambda.hat2 %*% (nrow(X.hat)*ginv.XX.hat)))
-
-                ## Lambda.hat1 <-  df.correction * (crossprod((X.hat*diag.ee), X.tilde))  
-                ## Lambda.hat2 <-  df.correction * (crossprod((X.tilde*diag.ee), X.hat))  
-                ## Phi.hat <- Psi.hat.wfe + Psi.hat.fe - 
-                ##     df.correction*(((nrow(X.hat)*ginv.XX.hat) %*% Lambda.hat1 %*% (nrow(X.tilde)*ginv.XX.tilde)) +
-                ##     ((nrow(X.tilde)*ginv.XX.tilde) %*% Lambda.hat2 %*% (nrow(X.hat)*ginv.XX.hat)))
+                Meat1 <- matrix(0, nrow=nK, ncol=nK)
+                Meat2 <- matrix(0, nrow=nK, ncol=nK)
+                ## add unit level vcov
+                for(g in 1:n.nonzero.units){
+                    if(nK==1){
+                        Meat1 <- Meat1 + matrix(XeeX1[g], ncol=nK, nrow=nK)
+                        Meat2 <- Meat2 + matrix(XeeX2[g], ncol=nK, nrow=nK)
+                    } else {
+                        Meat1 <- Meat1 + matrix(XeeX1[,g], ncol=nK, nrow=nK)
+                        Meat2 <- Meat2 + matrix(XeeX2[,g], ncol=nK, nrow=nK)
+                    }
+                }
                 
-
-                nK <- dim(X.tilde)[2]
-                df.white <- (nrow(X.tilde)-nK)/(nrow(X.tilde)- n.nonzero.units - n.nonzero.times - nK)
-
-                meat1 <- as.double(comp_OmegaHAC(c(X.tilde), e.tilde, c(X.hat), u.hat,
-                                                 dim(X.tilde)[1], dim(X.hat)[2], data$u.index, J.u))
-                Meat1 <- matrix(meat1, nrow=ncol(X.tilde), ncol=ncol(X.tilde), byrow=T)
-
-                meat2 <- as.double(comp_OmegaHAC(c(X.hat), u.hat, c(X.tilde), e.tilde,
-                                                 dim(X.hat)[1], dim(X.tilde)[2], data$u.index, J.u))
-                Meat2 <- matrix(meat2, nrow=ncol(X.tilde), ncol=ncol(X.tilde), byrow=T)
+                df.white <- (nrow(X.hat)-nK)/(nrow(X.tilde)- n.nonzero.units - n.nonzero.times - nK)
+                cov.term <- df.white*( (ginv.XX.tilde %*% Meat1 %*% ginv.XX.hat) + (ginv.XX.hat %*% Meat2 %*% ginv.XX.tilde))
                 
-                Phi.hat <- Psi.hat.wfe + Psi.hat.fe - df.white*( (ginv.XX.hat %*% Meat1 %*% ginv.XX.tilde) + (ginv.XX.tilde %*% Meat2 %*% ginv.XX.hat))
+                Phi.hat <- Psi.hat.wfe + Psi.hat.fe - cov.term
 
-                cov.term <- df.white*( (ginv.XX.tilde %*% Meat1 %*% ginv.XX.hat) + (ginv.XX.hat %*% Meat2 %*% ginv.XX.tilde) )
                 cov.term1 <- df.white*( (ginv.XX.tilde %*% Meat1 %*% ginv.XX.hat))
                 cov.term2 <- df.white*( (ginv.XX.hat %*% Meat2 %*% ginv.XX.tilde))
                 
@@ -1548,12 +1473,11 @@ wfe <- function (formula, data, treat = "treat.name",
                 ## White test: null hypothesis is ``no misspecification''
                 ## -----------------------------------------------------
 
-                ## white.stat <- as.double(Re( nrow(X.tilde)*(t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)) ))
-
                 white.stat <- as.double(Re(t(coef.ols - coef.wls) %*% ginv(Phi.hat) %*% (coef.ols - coef.wls)))
                 
-                test.null <- pchisq(as.numeric(white.stat), df=nK+1, lower.tail=F) < White.alpha
-                white.p <- pchisq(as.numeric(white.stat), df=nK+1, lower.tail=F)
+                test.null <- pchisq(as.numeric(white.stat), df=nK, lower.tail=F) < White.alpha
+                white.p <- pchisq(as.numeric(white.stat), df=nK, lower.tail=F)
+
                 flush.console()
 
                 if (verbose) {
