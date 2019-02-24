@@ -1420,22 +1420,28 @@ wfe <- function (formula, data, treat = "treat.name",
 
                 ## compute crossproducts with imaginary numbers
 
-                ## if(length(zero.ind)>0){
-                ##     X.wfe <- X.tilde[-zero.ind,]
-                ##     e.wfe <- e.tilde[-zero.ind]
-                ## } else {
-                ##     X.wfe <- X.tilde
-                ##     e.wfe <- e.tilde
-                ## }
+                resid2 <- (Y - X.tilde %*% betaT)
+
+                if(length(zero.ind)>0){
+                    X.wfe <- X.tilde[-zero.ind,]
+                    e.wfe <- resid[-zero.ind]
+                } else {
+                    X.wfe <- X.tilde
+                    e.wfe <- resid
+                }
+
+
+                XeeX.wfe <- as.numeric(Re(crossprod(e.tilde))) * t(X.wfe)  %*% (X.wfe)
+                
                 ## Xe.wfe <- Sparse_compMatrix_crossprod(Re(X.wfe), Im(X.wfe), Re(e.wfe), Im(e.wfe))
                 ## XeeX.wfe <- Sparse_compMatrix_tcrossprod(Xe.wfe[[1]], Xe.wfe[[2]], Xe.wfe[[1]], Xe.wfe[[2]])
                 ## Xee.wfe <- Sparse_compMatrix_tcrossprod(Xe.wfe[[1]], Xe.wfe[[2]], Re(e.wfe), Im(e.wfe))
-                ## XeeX.wfe <- Sparse_compMatrixMultiply(Xee.wfe[[1]], Xee.wfe[[2]], Re(X.wfe), Im(X.wfe))
-
+                ## XeeX.wfe <- Sparse_compMatrixMultiply(Xee.wfe[[1]], Xee.wfe[[2]], Re(X.wfe), Im(X.wfe))[[1]]
+                XeeX.wfe <- matrix(XeeX.wfe, nrow=ncol(X.tilde), ncol=ncol(X.tilde), byrow=F)
                 ## XeeX.wfe <- crossprod(X.wfe, e.wfe) %*% crossprod(e.wfe, X.wfe)
-                ## df_wfe2 <- (nrow(X.tilde)/(nrow(X.tilde)-1))*((nrow(X.tilde)-length(x.vars))/(nrow(X.tilde)- n.nonzero.units - n.nonzero.times - length(x.vars)))
-                ## Psi.hat.wfe <- df_wfe2*((ginv.XX.tilde %*% XeeX.wfe %*% ginv.XX.tilde))
-                ## print(Psi.hat.wfe)
+                df_wfe2 <- (nrow(X.tilde)/(nrow(X.tilde)-1))*((nrow(X.tilde)-length(x.vars))/(nrow(X.tilde)- n.nonzero.units - n.nonzero.times - length(x.vars)))
+                Psi.hat.wfe <- df_wfe2*((ginv.XX.tilde %*% XeeX.wfe %*% ginv.XX.tilde))
+                print(Psi.hat.wfe)
 
                 
                 ## if (verbose) {
@@ -1443,14 +1449,14 @@ wfe <- function (formula, data, treat = "treat.name",
                 ##     flush.console()
                 ## }
                 
-                Omega.hat.HAC <- as.double(comp_OmegaHAC(c(X.tilde), e.tilde, c(X.tilde), e.tilde,
-                                                         dim(X.tilde)[1], dim(X.tilde)[2], data$u.index, J.u))
-                Omega.hat.HAC <- matrix(Omega.hat.HAC, nrow=ncol(X.tilde), ncol=ncol(X.tilde), byrow=T)
+                ## Omega.hat.HAC <- as.double(comp_OmegaHAC(c(X.tilde), e.tilde, c(X.tilde), e.tilde,
+                ##                                          dim(X.tilde)[1], dim(X.tilde)[2], data$u.index, J.u))
+                ## Omega.hat.HAC <- matrix(Omega.hat.HAC, nrow=ncol(X.tilde), ncol=ncol(X.tilde), byrow=T)
                 
-                df_wfe2 <- (nrow(X.tilde)/(nrow(X.tilde)-1))*((nrow(X.tilde)-length(x.vars))/(nrow(X.tilde)- n.nonzero.units - n.nonzero.times - length(x.vars)))
-                Psi.hat.wfe <- df_wfe2*((ginv.XX.tilde %*% Omega.hat.HAC %*% ginv.XX.tilde))
+                ## df_wfe2 <- (nrow(X.tilde)/(nrow(X.tilde)-1))*((nrow(X.tilde)-length(x.vars))/(nrow(X.tilde)- n.nonzero.units - n.nonzero.times - length(x.vars)))
+                ## Psi.hat.wfe2 <- df_wfe2*((ginv.XX.tilde %*% Omega.hat.HAC %*% ginv.XX.tilde))
 
-                print(Psi.hat.wfe)
+                ## print(Psi.hat.wfe2)
 
                 ## -----------------------------------------------------
                 ## vcov matrix for FE for White statistics calculation

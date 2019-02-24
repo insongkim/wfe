@@ -14,7 +14,7 @@ wfe(formula, data, treat = "treat.name",
     unit.index, time.index = NULL, method = "unit",
     dyad1.index = NULL, dyad2.index = NULL,
     qoi = "ate", estimator = NULL, C.it = NULL,
-    hetero.se = TRUE, auto.se = TRUE, df.adjustment = TRUE,  
+    hetero.se = TRUE, auto.se = TRUE, 
     dyad.se = FALSE,
     White = TRUE, White.alpha = 0.05,
     verbose = TRUE, unbiased.se = FALSE, unweighted = FALSE,
@@ -92,10 +92,6 @@ wfe(formula, data, treat = "treat.name",
 
   \item{dyad.se}{a logical value indicating whether correlations across dyads exist. The
     default is \code{FALSE}. 
-  }
-
-  \item{df.adjustment}{a logical value indicating whether a degrees of freedom adjustment 
-      for standard errors calculation is performed. The default is \code{TRUE}.
   }
 
   \item{White}{a logical value indicating whether White misspecification
