@@ -1514,7 +1514,6 @@ wfe <- function (formula, data, treat = "treat.name",
                 white.stat <- "NULL"
                 test.null <- "NULL"
                 white.p <- "NULL"
-                cov.term <- "NULL"
             }
             
 
@@ -1589,7 +1588,6 @@ wfe <- function (formula, data, treat = "treat.name",
                       White.alpha = White.alpha,
                       White.stat = white.stat,
                       White.test = test.null,
-                      cov.term = cov.term,
                       Y.wdm = Y.wdm,
                       X.wdm = X.wdm)
 
