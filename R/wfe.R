@@ -776,6 +776,7 @@ wfe <- function (formula, data, treat = "treat.name",
                 if (verbose) {
                     cat("\nWeight calculation started ")
                     flush.console()
+
                 }
                 if(estimator == "Mdid"){
                     if(is.null(maxdev.did)){
@@ -1638,7 +1639,6 @@ summary.wfe <- function(object, signif.stars = getOption("show.signif.stars"),..
                 White.alpha = object$White.alpha,
                 White.stat = object$White.stat,
                 White.test = object$White.test,
-                cov.term = cov.term,
                 Y = object$y,
                 X = object$x,
                 Y.wdm = object$Y.wdm,

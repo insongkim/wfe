@@ -1057,7 +1057,7 @@ void GenWeightsUnit(int *unit_index, int *time_index, int *tr, int *C_it,
   for (i = 0 ; i < *len_u_index ; i++) {
 
 
-    if(*verbose) {
+    if(*verbose && *len_t_index>10) {
       int percent = *len_u_index/10;
       if (i % percent == 0){
 	/*  Rprintf("- %d th year calculated:\n", (j+1)); */
@@ -1197,7 +1197,7 @@ void GenWeightsTime(int *time_index, int *unit_index, int *tr, int *C_it,
   /* #pragma omp parallel for   */
   for (i = 0 ; i < *len_t_index ; i++) {
 
-    if(*verbose) {
+    if(*verbose && *len_t_index>10) {
       int percent = *len_t_index/10;
       if (i % percent == 0){
 	/*  Rprintf("- %d th year calculated:\n", (j+1)); */
@@ -1318,7 +1318,7 @@ void GenWeightsFD(int* unit_index, int* time_index, int* tr, int* C_it,
   /* #pragma omp parallel for   */
   for (j = 0 ; j < *len_t_index ; j++) {
 
-    if(*verbose) {
+    if(*verbose && *len_t_index>10) {
       int percent = *len_t_index/10;
       if (j % percent == 0){
 	/*  Rprintf("- %d th year calculated:\n", (j+1)); */
@@ -1901,11 +1901,10 @@ void GenWeightsDID(int* unit_index, int* time_index, int* tr, int* C_it,
     }
   }
 
-
   /* #pragma omp parallel for   */
   for (j = 1 ; j < *len_t_index ; j++) {
 
-    if(*verbose) {
+    if(*verbose && *len_t_index>10) {
       int percent = *len_t_index/10;
       if (j % percent == 0){
 	/*  Rprintf("- %d th year calculated:\n", (j+1)); */
@@ -1914,8 +1913,6 @@ void GenWeightsDID(int* unit_index, int* time_index, int* tr, int* C_it,
       }
     }
    
-
-  
     for (i = 0 ; i < *len_u_index ; i++) {
 
       /* initialize all elements of W to 0 */
@@ -1937,6 +1934,7 @@ void GenWeightsDID(int* unit_index, int* time_index, int* tr, int* C_it,
 	  //Rprintf("1] t_it: %f\n", t_it); 
 	}
       }
+
 
       if ( (exist[j][i]==1) && (exist[j-1][i]==1) && (same[j][i]!=1) ) { 
 	/* is_t_t1_same(unit_index, time_index, i+1, j+1, tr, *len_data) !=1) ) { */
@@ -2559,7 +2557,7 @@ void GenWeightsMDID(int* unit_index, int* time_index, int* tr, int* C_it,
   /* #pragma omp parallel for   */
   for (j = 1 ; j < *len_t_index ; j++) {
 
-    if(*verbose) {
+    if(*verbose && *len_t_index>10) {
       int percent = *len_t_index/10;
       if (j % percent == 0){
 	/*  Rprintf("- %d th year calculated:\n", (j+1)); */
