@@ -13,7 +13,7 @@
 wfe(formula, data, treat = "treat.name",
     unit.index, time.index = NULL, method = "unit",
     dyad1.index = NULL, dyad2.index = NULL,
-    qoi = "ate", estimator = NULL, C.it = NULL,
+    qoi = "ate", estimator = NULL, 
     hetero.se = TRUE, auto.se = TRUE, 
     dyad.se = FALSE,
     White = TRUE, White.alpha = 0.05,
@@ -75,10 +75,6 @@ wfe(formula, data, treat = "treat.name",
   \code{"Mdid"} implements the Difference-in-Differences design with
   Matching on the pretreatment outcome variables.}
   
-  \item{C.it}{an optional non-negative numeric vector specifying
-    relative weights for each unit of analysis. If not specified, the
-    weights will be calculated based on the estimator and quantity of
-    interest. }
   
   \item{hetero.se}{a logical value indicating whether heteroskedasticity
     across units is allowed in calculating standard errors. The default
@@ -186,11 +182,6 @@ wfe(formula, data, treat = "treat.name",
     = "did"}). For the two-way fixed effects model, set \code{estimator
     = "did"}
   
-  To specify different ex-ante weights for each unit of analysis, use
-  non-negative weights \code{C.it}. For instance, using the survey
-  weights for \code{C.it} enables the estimation fo the average
-  treatement effect for the target population.
-
   An object of class "wfe" contains vectors of unique unit(time) names and
   unique unit(time) indices. 
 

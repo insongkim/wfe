@@ -1,7 +1,7 @@
 wfe <- function (formula, data, treat = "treat.name",
                  unit.index, time.index = NULL, method = "unit",
                  dyad1.index = NULL, dyad2.index = NULL,
-                 qoi = "ate", estimator = NULL, C.it = NULL,
+                 qoi = "ate", estimator = NULL, 
                  hetero.se = TRUE, auto.se = TRUE,
                  dyad.se = FALSE,
                  White = TRUE, White.alpha = 0.05,
@@ -62,14 +62,14 @@ wfe <- function (formula, data, treat = "treat.name",
     if(is.null(time.index) && !is.null(estimator) && estimator == "fd")
         stop("First Difference cannot calculate when 'time.index' is missing")
 
-    ## Warning for C.it
-    if (!is.null(C.it)){
-        Cit <- data[,C.it]
-        if (!is.numeric(Cit) && length(Cit)!= tn.row)
-            stop("'C.it' must be a numeric vector with length equal to number of observations")
-        if ( sum(Cit < 0) > 0 )
-            stop("'C.it' must be a non-negative numeric vector")
-    }
+    ## ## Warning for C.it
+    ## if (!is.null(C.it)){
+    ##     Cit <- data[,C.it]
+    ##     if (!is.numeric(Cit) && length(Cit)!= tn.row)
+    ##         stop("'C.it' must be a numeric vector with length equal to number of observations")
+    ##     if ( sum(Cit < 0) > 0 )
+    ##         stop("'C.it' must be a non-negative numeric vector")
+    ## }
 
     ## cat("warnings done:\n")
     
